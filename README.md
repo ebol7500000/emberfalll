@@ -1,5 +1,5 @@
 
-# Emberfallv104: O App de Produtividade Forjado no Fogo da Rotina
+# Emberfallv: O App de Produtividade Forjado no Fogo da Rotina
 
 Bem-vindo, aventureiro — você acaba de entrar em Emberfall, uma terra onde afazeres se tornam quests e tarefas do dia a dia viram conquistas lendárias!
 
