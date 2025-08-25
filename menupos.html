@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Soulslike</title>
+     <link rel="icon" type="image/png" href=".././Gemini_Generated_Image_oza54roza54roza5.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            font-family: 'Cinzel', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .menu-container {
+            width: 350px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #444;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-list, .submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-category {
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .menu-category:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .menu-item {
+            margin-top: 5px;
+            transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+
+        .menu-item a {
+            color: #f0f0f0;
+            text-decoration: none;
+            display: block;
+            padding: 8px 10px;
+            transition: background-color 0.2s, color 0.2s, padding-left 0.2s;
+            position: relative;
+            font-size: 0.95em;
+        }
+
+        .menu-item a::before {
+            content: '▶';
+            position: absolute;
+            left: 10px;
+            opacity: 0;
+            transition: opacity 0.2s, left 0.2s;
+        }
+
+        .menu-item a:hover {
+            color: #d4a761;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding-left: 30px;
+        }
+
+        .menu-item a:hover::before {
+            opacity: 1;
+            left: 15px;
+            color: #d4a761;
+        }
+
+        .category-title-link {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #d4a761;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            padding: 8px 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.2s, padding-left 0.2s;
+            position: relative;
+        }
+        
+        .category-title-link:hover {
+            color: #d4a761;
+            padding-left: 15px; /* Ajustado para um hover mais sutil */
+        }
+
+        .category-title-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 100%;
+            background-color: #d4a761;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .category-title-link:hover::before {
+            opacity: 1;
+        }
+
+        .submenu {
+            padding-left: 20px; /* Adiciona recuo para os subitens */
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <ul class="menu-list">
+            <li class="menu-category">
+                <a href="#menu-mmorpg" class="category-title-link">Menu </a>
+                <ul class="submenu">
+                    <li class="menu-item"><a href="books.html">Barras </a></li>
+                    <li class="menu-item"><a href="lowandhigh.html">Caminho</a></li>
+                    <li class="menu-item"><a href="materias.html">Matérias</a></li>
+                    <li class="menu-item"><a href="potion_gr.html">Potion course</a></li>
+                    <li class="menu-item"><a href="golden_y.html">Calendário</a></li>
+                </ul>
+            </li>
+            <li class="menu-category">
+                <a href="timeline_w.html" class="category-title-link">Linha do Tempo Visual</a>
+                <ul class="submenu">
+                    <li class="menu-item"><a href="evo.html">Evolução</a></li>
+                    <li class="menu-item"><a href="greatBox.html">Bau reserva</a></li>
+                    <li class="menu-item"><a href="mainLevel.html">Lista de Itens *</a></li>
+                </ul>
+            </li>
+            <li class="menu-category">
+                <a href="#outros" class="category-title-link">Outros</a>
+                <ul class="submenu">
+                    <li class="menu-item"><a href="navigator_two.html">Navegador</a></li>
+                    <li class="menu-item"><a href="modulo_combat.html">Jogo de Combate *</a>
+                    </li><li class="menu-item"><a href="calc.html">ferramente de level</a>
+                    <li class="menu-item"><a href="paragon.html">paragon</a>
+                    </li><li class="menu-item"><a href="calcparagon.html">ferramente de level 2</a>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

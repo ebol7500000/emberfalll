@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigator</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --main-bg-color: #1a1a1a;
+            --accent-color: #d4a761;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+            --button-primary: #3f51b5;
+            --button-secondary: #555;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(212, 167, 97, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        #main-container {
+            width: 90%;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        #image-container {
+            position: relative;
+            margin: 20px 0;
+            cursor: crosshair;
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 0 10px rgba(212, 167, 97, 0.3);
+            display: inline-block;
+            background-color: var(--main-bg-color);
+            overflow: hidden;
+            border-radius: 8px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #image-container img {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+        }
+
+        #placeholder-text {
+            padding: 50px;
+            font-family: Arial, sans-serif;
+            font-size: 1.2em;
+            color: #777;
+        }
+
+        .point {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+            transform: translate(-50%, -50%); /* Centraliza o ponto no clique */
+        }
+
+        .point.red {
+            width: 24px;
+            height: 24px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .point.blue {
+            width: 16px;
+            height: 16px;
+            background-color: #007bff;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 5px #007bff;
+        }
+
+        .point.gold {
+            width: 16px;
+            height: 16px;
+            background-color: #d4a761;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 5px #d4a761;
+        }
+
+        .point.white {
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-radius: 50%;
+            border: 2px solid #333;
+            box-shadow: 0 0 5px white;
+        }
+
+        .point-name {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: var(--text-color);
+            padding: 5px 10px;
+            border-radius: 5px;
+            white-space: nowrap;
+            display: none;
+            pointer-events: none;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+        }
+        
+        .point:hover .point-name {
+            display: block;
+        }
+        
+        #controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--main-bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        #point-type-selection {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .point-type-btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            background-color: var(--main-bg-color);
+            color: var(--text-color);
+        }
+        
+        .point-type-btn.active {
+            background-color: transparent;
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(212, 167, 97, 0.7);
+        }
+
+        .point-type-btn:not(.active):hover {
+            background-color: #333;
+            border-color: #666;
+        }
+
+        #point-name-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #point-name {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            background-color: #222;
+            color: var(--text-color);
+            border-radius: 5px;
+        }
+
+        #save-point {
+            padding: 10px 15px;
+            background-color: var(--accent-color);
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #save-point:hover {
+            background-color: #c49455;
+        }
+
+        .control-button {
+            padding: 10px 15px;
+            background-color: var(--button-primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .control-button.secondary {
+            background-color: var(--button-secondary);
+        }
+
+        .control-button:hover {
+            background-color: #0056b3;
+        }
+
+        .control-button.secondary:hover {
+            background-color: #777;
+        }
+
+        #top-controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        input[type="file"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            background-color: #222;
+            color: var(--text-color);
+            border-radius: 5px;
+        }
+
+        input[type="file"]::file-selector-button {
+            background-color: var(--button-secondary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-right: 10px;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background-color: #777;
+        }
+
+        #gps-coords {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #gps-coords .gps-icon {
+            width: 24px;
+            height: 24px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23d4a761"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin-right: 8px;
+        }
+
+        .crud-container {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .crud-container h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px rgba(212, 167, 97, 0.3);
+        }
+        
+        .crud-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .crud-table th, .crud-table td {
+            padding: 12px;
+            border: 1px solid #222;
+        }
+        
+        .crud-table th {
+            background-color: var(--main-bg-color);
+            font-weight: bold;
+            color: #ddd;
+        }
+        
+        .crud-table td {
+            background-color: #0f0f0f;
+        }
+        
+        .crud-table button {
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .crud-table .edit-btn {  
+            background-color: #ffc107;  
+            color: black;  
+        }
+        .crud-table .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        .crud-table .delete-btn {  
+            background-color: #dc3545;  
+            color: white;  
+        }
+        .crud-table .delete-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .crud-table input[type="text"] {
+            background-color: #222;
+            border: 1px solid #555;
+            color: white;
+            padding: 5px;
+            width: 80%;
+            box-sizing: border-box;
+        }
+
+        /* Estilos para os menus colapsáveis */
+        .collapse-section {
+            width: 100%;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .collapse-header {
+            padding: 15px;
+            background-color: var(--main-bg-color);
+            color: var(--accent-color);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+        }
+
+        .collapse-header:hover {
+            background-color: #222;
+        }
+
+        .collapse-header::after {
+            content: '+';
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+
+        .collapse-header.active::after {
+            content: '-';
+        }
+
+        .collapse-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #1a1a1a;
+        }
+
+        .collapse-content.active {
+            max-height: 5000px;
+            padding: 15px;
+            transition: max-height 0.5s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <h1>navigator</h1>
+
+        <div id="image-container">
+            <p id="placeholder-text">Carregue uma imagem para começar...</p>
+        </div>
+
+        <div class="collapse-section">
+            <div class="collapse-header">
+                Add & Status
+            </div>
+            <div class="collapse-content">
+                <div id="controls">
+                    <div id="top-controls">
+                        <input type="file" id="image-uploader" accept="image/*">
+                        <input type="file" id="json-importer" accept="application/json" style="display: none;">
+                        <button id="import-json-btn" class="control-button secondary">Carregar Pontos</button>
+                        <button id="save-json-btn" class="control-button">Salvar Pontos</button>
+                    </div>
+
+                    <div id="point-type-selection">
+                        <button id="point-type-red" class="point-type-btn active" data-type="red">Pino Vermelho (Desafiante)</button>
+                        <button id="point-type-blue" class="point-type-btn" data-type="blue">Círculo Azul (Centro Urbano)</button>
+                        <button id="point-type-gold" class="point-type-btn" data-type="gold">Círculo Amarelo (Tesouro)</button>
+                        <button id="point-type-white" class="point-type-btn" data-type="white">Círculo Branco (Player)</button>
+                    </div>
+
+                    <div id="point-name-input" style="display: none;">
+                        <input type="text" id="point-name" placeholder="Nome do ponto">
+                        <button id="save-point">Salvar</button>
+                    </div>
+                </div>
+
+                <div id="gps-coords">
+                    <span class="gps-icon"></span>
+                    <span>Localização GPS: Carregando...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse-section">
+            <div class="collapse-header">
+                Pontos Normais
+            </div>
+            <div class="collapse-content">
+                <div class="crud-container">
+                    <table class="crud-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Coordenadas</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="normal-points-list">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse-section">
+            <div class="collapse-header">
+                Pontos de Desafiante
+            </div>
+            <div class="collapse-content">
+                <div class="crud-container">
+                    <table class="crud-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Coordenadas</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="challenge-points-list">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse-section">
+            <div class="collapse-header">
+                Pontos de Tesouro
+            </div>
+            <div class="collapse-content">
+                <div class="crud-container">
+                    <table class="crud-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Coordenadas</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="treasure-points-list">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const imageUploader = document.getElementById('image-uploader');
+        const imageContainer = document.getElementById('image-container');
+        const placeholderText = document.getElementById('placeholder-text');
+        const pointTypeButtons = document.querySelectorAll('.point-type-btn');
+        const pointNameInput = document.getElementById('point-name');
+        const savePointButton = document.getElementById('save-point');
+        const pointNameInputContainer = document.getElementById('point-name-input');
+        const normalPointsList = document.getElementById('normal-points-list');
+        const challengePointsList = document.getElementById('challenge-points-list');
+        const treasurePointsList = document.getElementById('treasure-points-list');
+        const saveJsonButton = document.getElementById('save-json-btn');
+        const importJsonBtn = document.getElementById('import-json-btn');
+        const jsonImporter = document.getElementById('json-importer');
+        const gpsCoordsDiv = document.getElementById('gps-coords');
+        const collapseHeaders = document.querySelectorAll('.collapse-header');
+
+        let currentImage = null;
+        let points = [];
+        let selectedPointType = 'red';
+        let pendingPoint = null;
+        let editingIndex = -1;
+
+        // --- Funções de GPS ---
+        function getGeolocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                gpsCoordsDiv.querySelector('span:last-child').textContent = "Geolocalização não é suportada por este navegador.";
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const message = `Localização GPS: Latitude ${lat.toFixed(6)}, Longitude ${lon.toFixed(6)}`;
+            gpsCoordsDiv.querySelector('span:last-child').textContent = message;
+            localStorage.setItem('gps_coords', JSON.stringify({ lat, lon }));
+        }
+
+        function showError(error) {
+            let errorMessage;
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = "Permissão de geolocalização negada.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = "Informação de localização indisponível.";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = "A solicitação para obter a localização expirou.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    errorMessage = "Ocorreu um erro desconhecido.";
+                    break;
+            }
+            gpsCoordsDiv.querySelector('span:last-child').textContent = errorMessage;
+        }
+
+        // --- Funções de Imagem e Pontos ---
+        function loadSavedImage() {
+            const savedImage = localStorage.getItem('current_image');
+            const savedPoints = localStorage.getItem('image_points');
+
+            if (savedImage) {
+                placeholderText.style.display = 'none';
+                
+                const oldImage = imageContainer.querySelector('img');
+                if (oldImage) {
+                    oldImage.remove();
+                }
+
+                currentImage = new Image();
+                currentImage.onload = () => {
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(currentImage);
+
+                    if (savedPoints) {
+                        try {
+                            points = JSON.parse(savedPoints);
+                            renderPoints();
+                        } catch (e) {
+                            console.error('Erro ao carregar pontos salvos:', e);
+                            points = [];
+                            renderPoints();
+                        }
+                    } else {
+                        points = [];
+                        renderPoints();
+                    }
+                };
+                currentImage.onerror = () => {
+                    placeholderText.style.display = 'block';
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(placeholderText);
+                    alert('Erro ao carregar a imagem salva.');
+                };
+                currentImage.src = savedImage;
+            } else {
+                placeholderText.style.display = 'block';
+                imageContainer.innerHTML = '';
+                imageContainer.appendChild(placeholderText);
+            }
+        }
+
+        function renderPoints() {
+            // Remove todos os pontos existentes
+            document.querySelectorAll('.point').forEach(p => p.remove());
+            
+            // Limpa as listas
+            normalPointsList.innerHTML = '';
+            challengePointsList.innerHTML = '';
+            treasurePointsList.innerHTML = '';
+
+            // Renderiza cada ponto
+            points.forEach((point, index) => {
+                createPointElement(point, index);
+                addPointToTable(point, index);
+            });
+        }
+        
+        function createPointElement(point, index) {
+            const pointDiv = document.createElement('div');
+            pointDiv.className = `point ${point.type}`;
+            
+            // Posiciona o ponto usando porcentagem relativa ao container da imagem
+            pointDiv.style.left = `${point.x_percent * 100}%`;
+            pointDiv.style.top = `${point.y_percent * 100}%`;
+
+            pointDiv.dataset.index = index;
+
+            const pointNameDiv = document.createElement('div');
+            pointNameDiv.className = 'point-name';
+            pointNameDiv.textContent = point.name;
+            pointDiv.appendChild(pointNameDiv);
+
+            pointDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                editPoint(index);
+            });
+
+            imageContainer.appendChild(pointDiv);
+            return pointDiv;
+        }
+
+        function addPointToTable(point, index) {
+            const row = document.createElement('tr');
+            let listToAppend;
+            let typeText = '';
+
+            const x_percent = (point.x_percent * 100).toFixed(2);
+            const y_percent = (point.y_percent * 100).toFixed(2);
+
+            switch (point.type) {
+                case 'blue':
+                case 'white':
+                    listToAppend = normalPointsList;
+                    typeText = point.type === 'blue' ? 'Círculo Azul (Centro Urbano)' : 'Círculo Branco (Player)';
+                    row.innerHTML = `
+                        <td>${point.name}</td>
+                        <td>${typeText}</td>
+                        <td>(${x_percent}%, ${y_percent}%)</td>
+                        <td>
+                            <button class="edit-btn" data-index="${index}">Editar</button>
+                            <button class="delete-btn" data-index="${index}">Excluir</button>
+                        </td>
+                    `;
+                    break;
+                case 'red':
+                    listToAppend = challengePointsList;
+                    row.innerHTML = `
+                        <td>${point.name}</td>
+                        <td>(${x_percent}%, ${y_percent}%)</td>
+                        <td>
+                            <button class="edit-btn" data-index="${index}">Editar</button>
+                            <button class="delete-btn" data-index="${index}">Excluir</button>
+                        </td>
+                    `;
+                    break;
+                case 'gold':
+                    listToAppend = treasurePointsList;
+                    row.innerHTML = `
+                        <td>${point.name}</td>
+                        <td>(${x_percent}%, ${y_percent}%)</td>
+                        <td>
+                            <button class="edit-btn" data-index="${index}">Editar</button>
+                            <button class="delete-btn" data-index="${index}">Excluir</button>
+                        </td>
+                    `;
+                    break;
+            }
+
+            if (listToAppend) {
+                listToAppend.appendChild(row);
+            }
+        }
+
+        function savePoint() {
+            if (pointNameInput.value.trim()) {
+                if (pendingPoint) {
+                    pendingPoint.name = pointNameInput.value.trim();
+                    if (editingIndex !== -1) {
+                        points[editingIndex] = pendingPoint;
+                    } else {
+                        points.push(pendingPoint);
+                    }
+                    
+                    localStorage.setItem('image_points', JSON.stringify(points));
+                    
+                    renderPoints();
+                    
+                    resetPointForm();
+                }
+            } else {
+                alert('Por favor, digite um nome para o ponto.');
+            }
+        }
+
+        function resetPointForm() {
+            pendingPoint = null;
+            editingIndex = -1;
+            pointNameInput.value = '';
+            pointNameInputContainer.style.display = 'none';
+            document.querySelectorAll('.point.temporary').forEach(p => p.remove());
+        }
+
+        function editPoint(index) {
+            const point = points[index];
+            pointNameInput.value = point.name;
+            pointNameInputContainer.style.display = 'flex';
+            pointNameInput.focus();
+            
+            pendingPoint = { ...point };
+            editingIndex = index;
+            
+            // Remove o ponto da interface para que ele seja redesenhado ao salvar
+            const pointElementToRemove = document.querySelector(`.point[data-index="${index}"]`);
+            if (pointElementToRemove) {
+                pointElementToRemove.remove();
+            }
+            
+            // Abre a seção correspondente ao tipo de ponto
+            openCorrespondingSection(point.type);
+        }
+
+        function deletePoint(index) {
+            if (confirm(`Tem certeza que deseja excluir o ponto "${points[index].name}"?`)) {
+                points.splice(index, 1);
+                localStorage.setItem('image_points', JSON.stringify(points));
+                renderPoints();
+            }
+        }
+
+        function openCorrespondingSection(pointType) {
+            // Fecha todas as seções primeiro
+            document.querySelectorAll('.collapse-header').forEach(header => {
+                header.classList.remove('active');
+                header.nextElementSibling.classList.remove('active');
+            });
+            
+            // Abre a seção correta baseada no tipo de ponto
+            let sectionHeader;
+            switch(pointType) {
+                case 'red':
+                    sectionHeader = document.querySelector('.collapse-section:nth-child(3) .collapse-header');
+                    break;
+                case 'blue':
+                case 'white':
+                    sectionHeader = document.querySelector('.collapse-section:nth-child(2) .collapse-header');
+                    break;
+                case 'gold':
+                    sectionHeader = document.querySelector('.collapse-section:nth-child(4) .collapse-header');
+                    break;
+            }
+            
+            if (sectionHeader) {
+                sectionHeader.classList.add('active');
+                sectionHeader.nextElementSibling.classList.add('active');
+            }
+        }
+
+        // --- Funções de Salvar/Carregar JSON ---
+        function savePointsToJson() {
+            const data = {
+                image: localStorage.getItem('current_image'),
+                points: points
+            };
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pontos_salvos.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadPointsFromJson(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const loadedData = JSON.parse(e.target.result);
+                    if (loadedData.image && loadedData.points) {
+                        localStorage.setItem('current_image', loadedData.image);
+                        localStorage.setItem('image_points', JSON.stringify(loadedData.points));
+                        loadSavedImage();
+                    } else {
+                        alert('Arquivo JSON inválido. Verifique se ele contém as chaves "image" e "points".');
+                    }
+                } catch (error) {
+                    alert('Erro ao processar o arquivo JSON. Certifique-se de que é um JSON válido.');
+                    console.error('Erro ao carregar JSON:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- Event Listeners ---
+        imageUploader.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageDataUrl = e.target.result;
+                    localStorage.setItem('current_image', imageDataUrl);
+                    localStorage.removeItem('image_points');
+                    points = [];
+                    loadSavedImage();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        imageContainer.addEventListener('click', (event) => {
+            if (currentImage) {
+                // Se o clique foi em um ponto, ignorar
+                if (event.target.classList.contains('point')) {
+                    return;
+                }
+                
+                // Obtém as coordenadas relativas ao container da imagem
+                const rect = imageContainer.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+
+                // Calcula a posição do ponto como porcentagem relativa ao container
+                const x_percent = x / rect.width;
+                const y_percent = y / rect.height;
+
+                // Reseta o formulário de edição para um novo ponto
+                resetPointForm();
+
+                pendingPoint = {
+                    x_percent: x_percent,
+                    y_percent: y_percent,
+                    type: selectedPointType,
+                    name: 'Novo Ponto'
+                };
+                
+                pointNameInput.value = '';
+                pointNameInputContainer.style.display = 'flex';
+                pointNameInput.focus();
+
+                const tempPointDiv = createPointElement(pendingPoint, -1);
+                tempPointDiv.classList.add('temporary');
+                
+                // Abre automaticamente a seção correspondente ao tipo de ponto
+                openCorrespondingSection(selectedPointType);
+                
+                const removeTempPoint = () => {
+                    if (tempPointDiv && document.body.contains(tempPointDiv)) {
+                        tempPointDiv.remove();
+                    }
+                };
+                
+                // Remove o ponto temporário se o usuário clicar fora do formulário
+                document.addEventListener('click', (e) => {
+                    if (!pointNameInputContainer.contains(e.target) && e.target !== savePointButton && e.target !== imageContainer) {
+                        removeTempPoint();
+                    }
+                }, { once: true });
+            }
+        });
+
+        savePointButton.addEventListener('click', savePoint);
+        
+        pointNameInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                savePoint();
+            }
+        });
+
+        pointTypeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                pointTypeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                selectedPointType = button.dataset.type;
+                resetPointForm();
+            });
+        });
+
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('edit-btn')) {
+                const index = parseInt(event.target.dataset.index);
+                if (!isNaN(index)) {
+                    editPoint(index);
+                }
+            } else if (event.target.classList.contains('delete-btn')) {
+                const index = parseInt(event.target.dataset.index);
+                if (!isNaN(index)) {
+                    deletePoint(index);
+                }
+            }
+        });
+
+        saveJsonButton.addEventListener('click', savePointsToJson);
+        importJsonBtn.addEventListener('click', () => jsonImporter.click());
+        jsonImporter.addEventListener('change', loadPointsFromJson);
+
+        // Event listeners para os menus colapsáveis
+        collapseHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                header.classList.toggle('active');
+                const content = header.nextElementSibling;
+                content.classList.toggle('active');
+            });
+        });
+
+        // Evento de redimensionamento da janela para renderizar os pontos novamente
+        window.addEventListener('resize', renderPoints);
+
+        // Abre a primeira seção por padrão
+        document.querySelector('.collapse-header').classList.add('active');
+        document.querySelector('.collapse-content').classList.add('active');
+
+        // --- Inicialização ---
+        getGeolocation();
+        loadSavedImage();
+    </script>
+</body>
+</html>

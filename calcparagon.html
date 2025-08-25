@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paragon</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #d4a761;
+            --secondary-color: #333;
+            --background-color: #121212;
+            --text-color: #f0f0f0;
+            --border-color: #555;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .calculator-container {
+            background-color: var(--secondary-color);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: #222;
+            color: var(--text-color);
+            font-size: 1em;
+            box-sizing: border-box;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 2px solid var(--border-color);
+            text-align: left;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+        }
+
+        .result-item strong {
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+
+        .result-value {
+            font-size: 1.1em;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container">
+        <h1>Paragon</h1>
+        <div class="input-group">
+            <label for="level">Nível (99 - 1000):</label>
+            <input type="number" id="level" name="level" min="99" max="1000" value="99">
+        </div>
+
+        <div id="results-container" class="results">
+            <div class="result-item">
+                <strong>Ataque:</strong> <span id="atk-value" class="result-value"></span>
+            </div>
+            <div class="result-item">
+                <strong>Defesa:</strong> <span id="def-value" class="result-value"></span>
+            </div>
+            <div class="result-item">
+                <strong>Poder:</strong> <span id="pw-value" class="result-value"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const levelInput = document.getElementById('level');
+            const atkValue = document.getElementById('atk-value');
+            const defValue = document.getElementById('def-value');
+            const pwValue = document.getElementById('pw-value');
+            
+            // Função para calcular e exibir as estatísticas
+            function updateStats() {
+                let level = parseInt(levelInput.value);
+                
+                // Define os limites do nível
+                const minLevel = 99;
+                const maxLevel = 1000;
+
+                if (isNaN(level) || level < minLevel) {
+                    level = minLevel;
+                    levelInput.value = minLevel;
+                } else if (level > maxLevel) {
+                    level = maxLevel;
+                    levelInput.value = maxLevel;
+                }
+                
+                // Salva o nível no localStorage
+                localStorage.setItem('d2_level', level);
+
+                // Fórmulas de simulação
+                const calculatedAtk = 20 + (level * 25);
+                const calculatedDef = 10 + (level * 20);
+                const calculatedPw = 5 + (level * 10);
+
+                // Atualiza os valores na tela
+                atkValue.textContent = calculatedAtk.toLocaleString('pt-BR');
+                defValue.textContent = calculatedDef.toLocaleString('pt-BR');
+                pwValue.textContent = calculatedPw.toLocaleString('pt-BR');
+            }
+
+            // Carrega o nível salvo do localStorage ao iniciar
+            const savedLevel = localStorage.getItem('d2_level');
+            const initialLevel = 99;
+            if (savedLevel) {
+                const parsedLevel = parseInt(savedLevel);
+                if (parsedLevel >= 99 && parsedLevel <= 1000) {
+                    levelInput.value = parsedLevel;
+                } else {
+                    levelInput.value = initialLevel;
+                }
+            } else {
+                levelInput.value = initialLevel;
+            }
+
+            // Atualiza as estatísticas ao carregar a página
+            updateStats();
+
+            // Adiciona um "listener" para atualizar as estatísticas sempre que o nível mudar
+            levelInput.addEventListener('input', updateStats);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paragon: Jogo de Luta no Estilo Egípcio</title>
+    <style>
+        /* Estilos Globais */
+        body {
+            background-color: #000000;
+            color: #d4a761;
+            font-family: 'Cinzel', serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+        .site-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Card Paragon (Topo) */
+        .paragon-card {
+            background-color: rgba(128, 128, 128, 0.1);
+            border: 3px solid #d4a761;
+            padding: 30px 40px;
+            margin: 40px auto;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #d4a761;
+            max-width: 600px;
+        }
+
+        .card-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5em;
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+            letter-spacing: 5px;
+        }
+        
+        /* Estilo para as seções colapsáveis */
+        details {
+            border: 1px solid #d4a761;
+            border-radius: 5px;
+            margin-top: 20px;
+            background-color: rgba(128, 128, 128, 0.1);
+            text-align: left;
+            padding: 10px;
+        }
+
+        summary {
+            font-size: 1.5em;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 10px;
+            outline: none;
+            user-select: none; /* Evita que o texto seja selecionado ao clicar */
+        }
+        
+        .section-content {
+            padding: 10px;
+            padding-top: 20px; /* Adiciona um espaço extra após a linha */
+        }
+
+        .section-separator {
+            width: 80%;
+            border: 1px solid #d4a761;
+            margin: 20px auto;
+        }
+
+        /* Estilos do Player Info e XP */
+        .player-info {
+            margin-top: 25px;
+        }
+
+        .player-level {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .xp-bar-container {
+            background-color: #333;
+            height: 25px;
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid #d4a761;
+            margin: 10px auto;
+            position: relative;
+        }
+
+        .xp-bar {
+            height: 100%;
+            background-color: #d4a761;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .xp-text {
+            font-size: 1.1em;
+            margin-top: 5px;
+            color: #d4a761;
+        }
+
+        /* Controles e Backup */
+        .controls, .backup-section {
+            margin-top: 20px;
+        }
+        
+        .xp-controls, .update-controls, .ficha-controls {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .xp-controls label, .update-controls label, .ficha-controls label {
+            font-size: 1.1em;
+            margin-right: 10px;
+        }
+
+        .controls button, .backup-section button, .backup-section textarea, .xp-controls input, .xp-controls button, .update-controls button, .update-controls input, .ficha-controls input, .ficha-controls button {
+            background-color: #d4a761;
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            margin: 5px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .xp-controls input, .update-controls input, .ficha-controls input {
+            background-color: #333;
+            color: #d4a761;
+            border: 1px solid #d4a761;
+            padding: 10px;
+            width: 100px;
+            text-align: center;
+        }
+        
+        .controls button:hover, .backup-section button:hover, .xp-controls button:hover, .update-controls button:hover, .ficha-controls button:hover {
+            background-color: #b88a44;
+        }
+        
+        .backup-section textarea {
+            background-color: #333;
+            color: #d4a761;
+            border: 1px solid #d4a761;
+            padding: 10px;
+            width: 80%;
+            max-width: 500px;
+            resize: none;
+            font-family: monospace;
+            height: 100px;
+            margin-top: 10px;
+        }
+
+        /* Seção de Combate */
+        .combat-section {
+            width: 100%;
+            margin-top: 40px;
+            padding: 20px;
+            border: 2px solid #d4a761;
+            border-radius: 10px;
+            background-color: rgba(128, 128, 128, 0.1);
+        }
+
+        .combat-log {
+            background-color: #222;
+            border: 1px solid #d4a761;
+            padding: 15px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: scroll;
+            text-align: left;
+            font-family: monospace;
+            white-space: pre-wrap;
+            color: #fff;
+        }
+
+        .combat-section h4 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .combat-stats {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .hp-bar-container {
+            width: 80%;
+            background-color: #333;
+            height: 25px;
+            border: 2px solid #d4a761;
+            position: relative;
+            margin: 5px 0;
+        }
+
+        .hp-bar {
+            height: 100%;
+            background-color: #ff4d4d; /* Cor vermelha para a vida */
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .hp-text {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .combat-action-button {
+            display: none; /* Inicia escondido */
+        }
+
+        /* Estilo dos botões de combate */
+        #combat-start-button,
+        #combat-action-button {
+            background-color: #d4a761;
+            color: #000;
+            padding: 10px 20px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #combat-start-button:hover,
+        #combat-action-button:hover {
+            background-color: #b88a44;
+        }
+
+        #combat-start-button[disabled],
+        #combat-action-button[disabled] {
+            background-color: #555;
+            color: #888;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="site-container">
+        
+        <div class="paragon-card">
+            <h1 class="card-title">PARAGON</h1>
+        </div>
+
+        <details>
+            <summary>XP e Nível</summary>
+            <div class="section-content">
+                <div class="player-info">
+                    <p class="player-level">Level: <span id="player-level">99/1000</span></p>
+                    <div class="xp-bar-container">
+                        <div id="xp-bar" class="xp-bar"></div>
+                    </div>
+                    <p class="xp-text">XP: <span id="xp-text">0/1000</span></p>
+                </div>
+                <div class="xp-controls">
+                    <label for="xp-add-input">Adicionar XP:</label>
+                    <input type="number" id="xp-add-input" value="100" min="1">
+                    <button onclick="gainXP()">Adicionar</button>
+                </div>
+                <div class="update-controls">
+                    <label for="update-level">Atualizar:</label>
+                    <input type="number" id="update-level" placeholder="Nível" min="99" max="1000">
+                    <input type="number" id="update-xp" placeholder="XP" min="0">
+                    <button onclick="updateProgress()">Atualizar</button>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>Ficha</summary>
+            <div class="section-content">
+                <div class="ficha-controls">
+                    <label for="atk-input">ATK:</label>
+                    <input type="number" id="atk-input" value="10" min="1">
+                    <label for="def-input">DEF:</label>
+                    <input type="number" id="def-input" value="10" min="1">
+                    <label for="pw-input">PW:</label>
+                    <input type="number" id="pw-input" value="10" min="1">
+                    <button onclick="saveCharacterSheet()">Salvar Ficha</button>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>Backup</summary>
+            <div class="section-content">
+                <div class="backup-section">
+                    <textarea id="backup-data" readonly></textarea>
+                    <br>
+                    <button onclick="exportData()">Exportar Dados</button>
+                    <button onclick="importData()">Importar Dados</button>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>Combate</summary>
+            <div class="section-content">
+                <div class="combat-section">
+                    <p id="combat-status">Você precisa ser nível 99 para entrar em combate.</p>
+                    
+                    <div class="combat-stats" style="display: none;">
+                        <div>
+                            <h4>Seu HP</h4>
+                            <div class="hp-bar-container">
+                                <div id="player-hp-bar" class="hp-bar"></div>
+                                <span id="player-hp-text" class="hp-text"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4>HP do Inimigo</h4>
+                            <div class="hp-bar-container">
+                                <div id="enemy-hp-bar" class="hp-bar"></div>
+                                <span id="enemy-hp-text" class="hp-text"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="combat-start-button" onclick="startCombat()" disabled>Iniciar Combate</button>
+                    <button id="combat-action-button" class="combat-action-button" onclick="playerTurn()">Atacar</button>
+                    <div class="combat-log" id="combat-log"></div>
+                </div>
+            </div>
+        </details>
+
+    </div>
+
+    <script>
+        const MIN_LEVEL = 99;
+        const MAX_LEVEL = 1000;
+        
+        let playerLevel = MIN_LEVEL;
+        let playerXP = 0;
+        let xpRequired = 0;
+
+        let playerAtk = 10;
+        let playerDef = 10;
+        let playerPw = 10;
+
+        const playerMaxHP = 200;
+        let playerCurrentHP = playerMaxHP;
+
+        // Elementos da interface
+        const levelElement = document.getElementById('player-level');
+        const xpBarElement = document.getElementById('xp-bar');
+        const xpTextElement = document.getElementById('xp-text');
+        const xpAddInputElement = document.getElementById('xp-add-input');
+        const updateLevelInput = document.getElementById('update-level');
+        const updateXpInput = document.getElementById('update-xp');
+        const backupTextArea = document.getElementById('backup-data');
+        const atkInput = document.getElementById('atk-input');
+        const defInput = document.getElementById('def-input');
+        const pwInput = document.getElementById('pw-input');
+        const combatStartButton = document.getElementById('combat-start-button');
+        const combatActionButton = document.getElementById('combat-action-button');
+        const combatStatus = document.getElementById('combat-status');
+        const combatLog = document.getElementById('combat-log');
+        const combatStatsDiv = document.querySelector('.combat-stats');
+
+        // Barras de vida
+        const playerHPBar = document.getElementById('player-hp-bar');
+        const playerHPText = document.getElementById('player-hp-text');
+        const enemyHPBar = document.getElementById('enemy-hp-bar');
+        const enemyHPText = document.getElementById('enemy-hp-text');
+
+        // Lógica do Sistema de XP e Nível
+        function calculateXPRequired(level) {
+            if (level >= MAX_LEVEL) {
+                return Infinity;
+            }
+            return 1000 + ((level - MIN_LEVEL) * 100);
+        }
+
+        function updateUI() {
+            levelElement.textContent = `${playerLevel}/${MAX_LEVEL}`;
+            
+            const displayXP = Math.min(playerXP, xpRequired);
+            const xpPercentage = (xpRequired > 0 && xpRequired !== Infinity) ? (displayXP / xpRequired) * 100 : 0;
+            
+            xpBarElement.style.width = `${xpPercentage}%`;
+            xpTextElement.textContent = `${playerXP}/${xpRequired}`;
+
+            // Atualiza inputs da ficha
+            atkInput.value = playerAtk;
+            defInput.value = playerDef;
+            pwInput.value = playerPw;
+
+            // Atualiza status do combate
+            if (playerLevel >= MIN_LEVEL) {
+                combatStartButton.disabled = false;
+                combatStatus.textContent = "Seu nível é alto o suficiente para lutar!";
+            } else {
+                combatStartButton.disabled = true;
+                combatStatus.textContent = "Você precisa ser nível 99 para entrar em combate.";
+            }
+        }
+
+        function loadData() {
+            const savedLevel = localStorage.getItem('playerLevel');
+            const savedXP = localStorage.getItem('playerXP');
+            const savedAtk = localStorage.getItem('playerAtk');
+            const savedDef = localStorage.getItem('playerDef');
+            const savedPw = localStorage.getItem('playerPw');
+            
+            if (savedLevel && savedXP) {
+                playerLevel = parseInt(savedLevel);
+                playerXP = parseInt(savedXP);
+            }
+            if (savedAtk && savedDef && savedPw) {
+                playerAtk = parseInt(savedAtk);
+                playerDef = parseInt(savedDef);
+                playerPw = parseInt(savedPw);
+            }
+            
+            xpRequired = calculateXPRequired(playerLevel);
+            updateUI();
+        }
+
+        function saveData() {
+            localStorage.setItem('playerLevel', playerLevel);
+            localStorage.setItem('playerXP', playerXP);
+            localStorage.setItem('playerAtk', playerAtk);
+            localStorage.setItem('playerDef', playerDef);
+            localStorage.setItem('playerPw', playerPw);
+            console.log('Progresso salvo.');
+        }
+
+        function gainXP() {
+            let xpToAdd = parseInt(xpAddInputElement.value);
+            if (isNaN(xpToAdd) || xpToAdd <= 0) {
+                alert("Por favor, insira um valor de XP válido para adicionar.");
+                return;
+            }
+            playerXP += xpToAdd;
+            checkLevelUp();
+            updateUI();
+            saveData();
+        }
+
+        function updateProgress() {
+            let newLevel = parseInt(updateLevelInput.value);
+            let newXP = parseInt(updateXpInput.value);
+
+            if (isNaN(newLevel) || isNaN(newXP) || newLevel < MIN_LEVEL || newLevel > MAX_LEVEL || newXP < 0) {
+                alert(`Por favor, insira valores válidos.\nNível: entre ${MIN_LEVEL} e ${MAX_LEVEL}.\nXP: maior ou igual a 0.`);
+                return;
+            }
+
+            playerLevel = newLevel;
+            playerXP = newXP;
+            
+            checkLevelUp();
+            updateUI();
+            saveData();
+            alert('Progresso atualizado com sucesso!');
+        }
+        
+        function checkLevelUp() {
+            while (playerXP >= xpRequired && playerLevel < MAX_LEVEL) {
+                playerLevel++;
+                playerXP -= xpRequired;
+                xpRequired = calculateXPRequired(playerLevel);
+            }
+            if (playerLevel >= MAX_LEVEL) {
+                playerXP = Math.min(playerXP, xpRequired);
+            }
+        }
+
+        // Lógica do Sistema de Combate
+        let enemy = {};
+
+        function saveCharacterSheet() {
+            const newAtk = parseInt(atkInput.value);
+            const newDef = parseInt(defInput.value);
+            const newPw = parseInt(pwInput.value);
+
+            if (isNaN(newAtk) || isNaN(newDef) || isNaN(newPw) || newAtk <= 0 || newDef <= 0 || newPw <= 0) {
+                alert("Por favor, insira valores válidos para a sua ficha.");
+                return;
+            }
+
+            playerAtk = newAtk;
+            playerDef = newDef;
+            playerPw = newPw;
+            saveData();
+            alert("Ficha de personagem salva!");
+        }
+        
+        function updateCombatUI() {
+            const playerHPPercentage = (playerCurrentHP / playerMaxHP) * 100;
+            playerHPBar.style.width = `${playerHPPercentage}%`;
+            playerHPText.textContent = `${Math.max(0, playerCurrentHP)}/${playerMaxHP}`;
+
+            const enemyHPPercentage = (enemy.hp / enemy.maxHP) * 100;
+            enemyHPBar.style.width = `${enemyHPPercentage}%`;
+            enemyHPText.textContent = `${Math.max(0, enemy.hp)}/${enemy.maxHP}`;
+        }
+
+        function startCombat() {
+            if (playerLevel < MIN_LEVEL) {
+                alert("Você não tem nível suficiente para lutar!");
+                return;
+            }
+            
+            combatStartButton.style.display = 'none';
+            combatActionButton.style.display = 'block';
+            combatStatsDiv.style.display = 'flex';
+
+            playerCurrentHP = playerMaxHP;
+
+            enemy = {
+                name: "Esfinge da Batalha",
+                maxHP: 500,
+                hp: 500,
+                atk: 15,
+                def: 5
+            };
+            
+            updateCombatUI();
+            combatLog.textContent = "";
+            logCombat("A Batalha contra a Esfinge começou!");
+        }
+
+        function playerTurn() {
+            combatActionButton.disabled = true;
+
+            // Turno do jogador
+            let playerDamage = Math.max(1, (playerAtk + playerPw) - enemy.def);
+            enemy.hp -= playerDamage;
+            logCombat(`Você atacou a ${enemy.name} e causou ${playerDamage} de dano!`);
+            updateCombatUI();
+
+            if (enemy.hp <= 0) {
+                endCombat("win");
+                return;
+            }
+            
+            // Pausa breve para a reação do inimigo
+            setTimeout(enemyTurn, 1000);
+        }
+
+        function enemyTurn() {
+            // Turno do inimigo
+            let enemyDamage = Math.max(1, enemy.atk - playerDef);
+            playerCurrentHP -= enemyDamage;
+            logCombat(`${enemy.name} atacou e causou ${enemyDamage} de dano!`);
+            updateCombatUI();
+
+            if (playerCurrentHP <= 0) {
+                endCombat("loss");
+            } else {
+                combatActionButton.disabled = false;
+            }
+        }
+
+        function endCombat(result) {
+            combatStartButton.style.display = 'block';
+            combatActionButton.style.display = 'none';
+            combatStatsDiv.style.display = 'none';
+            combatActionButton.disabled = false;
+
+            if (result === "win") {
+                const xpGain = 200 + (Math.random() * 50);
+                logCombat(`\n🎉 Vitória! Você derrotou a ${enemy.name}!`);
+                logCombat(`Você ganhou ${Math.floor(xpGain)} XP de recompensa!`);
+                playerXP += Math.floor(xpGain);
+                checkLevelUp();
+                saveData();
+            } else {
+                logCombat(`\n💀 Derrota! Você foi derrotado pela ${enemy.name}.`);
+            }
+            updateUI();
+        }
+
+        function logCombat(message) {
+            combatLog.textContent += `> ${message}\n`;
+            combatLog.scrollTop = combatLog.scrollHeight;
+        }
+
+        // Funções para o sistema de backup (Importar e Exportar)
+        function exportData() {
+            const data = {
+                level: playerLevel,
+                xp: playerXP,
+                atk: playerAtk,
+                def: playerDef,
+                pw: playerPw
+            };
+            backupTextArea.value = JSON.stringify(data);
+            backupTextArea.select();
+            document.execCommand('copy');
+            alert('Dados copiados para a área de transferência! Cole em um local seguro.');
+        }
+
+        function importData() {
+            const dataString = prompt("Cole os dados de backup aqui:");
+            if (dataString) {
+                try {
+                    const data = JSON.parse(dataString);
+                    if (data.level !== undefined && data.xp !== undefined && data.atk !== undefined && data.def !== undefined && data.pw !== undefined) {
+                        playerLevel = parseInt(data.level);
+                        playerXP = parseInt(data.xp);
+                        playerAtk = parseInt(data.atk);
+                        playerDef = parseInt(data.def);
+                        playerPw = parseInt(data.pw);
+                        
+                        if (playerLevel < MIN_LEVEL) playerLevel = MIN_LEVEL;
+                        if (playerLevel > MAX_LEVEL) playerLevel = MAX_LEVEL;
+                        if (playerXP < 0) playerXP = 0;
+                        if (playerAtk < 1) playerAtk = 1;
+                        if (playerDef < 1) playerDef = 1;
+                        if (playerPw < 1) playerPw = 1;
+                        
+                        xpRequired = calculateXPRequired(playerLevel);
+                        
+                        updateUI();
+                        saveData();
+                        alert('Dados importados com sucesso!');
+                    } else {
+                        alert('Formato de dados inválido.');
+                    }
+                } catch (e) {
+                    alert('Erro ao importar dados. Verifique o formato.');
+                }
+            }
+        }
+
+        // Carrega os dados ao iniciar a página
+        window.onload = loadData;
+    </script>
+</body>
+</html>

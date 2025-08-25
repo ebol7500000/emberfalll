@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário</title>
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_oza54roza54roza5.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos Gerais (Modificados para o tema escuro e a fonte Cinzel) */
+        body {
+            font-family: 'Cinzel', serif; /* Fonte Cinzel */
+            background-color: #1a1a1a; /* Fundo cinza escuro */
+            color: #d4a761; /* Cor de destaque para o texto */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #2b2b2b;
+            color: #d4a761;
+            padding: 20px 0;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            border-bottom: 2px solid #555;
+        }
+
+        main {
+            width: 90%;
+            max-width: 960px;
+            margin: 20px auto;
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border: 2px solid #555;
+        }
+
+        section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #555;
+        }
+
+        section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        h1, h2, h3 {
+            color: #d4a761;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        button {
+            background-color: #333; /* Fundo do botão cinza */
+            color: #d4a761; /* Cor do texto do botão */
+            border: 1px solid #555;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            font-family: 'Cinzel', serif;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #555;
+            background-color: #333; /* Fundo do input mais escuro */
+            color: #d4a761;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Calendário (Modificado para o tema escuro) */
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav button {
+            padding: 8px 12px;
+        }
+
+        #currentMonthYear {
+            font-size: 1.5rem;
+            color: #d4a761;
+            font-weight: 700;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .day-name {
+            background-color: #333;
+            padding: 10px;
+            font-weight: bold;
+            color: #d4a761;
+            border-radius: 5px;
+        }
+
+        .day-cell {
+            background-color: #2c2c2c;
+            padding: 15px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            border: 1px solid #555;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .day-cell:hover:not(.empty) {
+            background-color: #3a3a3a;
+            transform: translateY(-2px);
+        }
+
+        .day-cell.current-day {
+            border: 2px solid #d4a761; /* Cor de destaque para o dia atual */
+            background-color: #3a3a3a;
+        }
+
+        .day-cell.selected {
+            background-color: #444;
+            border: 2px solid #d4a761; /* Cor de destaque para o dia selecionado */
+        }
+
+        .day-number {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .empty {
+            background-color: #1f1f1f;
+            cursor: default;
+            border: none;
+        }
+
+        /* Badge de Tarefas no Calendário */
+        .task-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #d4a761;
+            color: black;
+            font-size: 0.7em;
+            padding: 3px 6px;
+            border-radius: 10px;
+            line-height: 1;
+            font-weight: bold;
+        }
+
+        /* Área de Input de Tarefas */
+        #task-input-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #555;
+        }
+
+        #task-input-section input {
+            width: 70%;
+            margin-right: 10px;
+        }
+
+        #task-input-section button {
+            width: 25%;
+        }
+        
+        .import-export-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Lista de Tarefas (Modificada para o tema escuro) */
+        #taskList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #taskList li {
+            background-color: #333;
+            border: 1px solid #555;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #taskList li.completed {
+            background-color: #2c2c2c;
+            opacity: 0.7;
+        }
+
+        #taskList li.completed span.task-text {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        #taskList li input[type="checkbox"] {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            filter: invert(1);
+        }
+
+        .task-actions button {
+            background-color: #555;
+            color: #d4a761;
+            margin-left: 5px;
+            padding: 5px 8px;
+            font-size: 0.9rem;
+        }
+
+        .task-actions button.edit-btn {
+            background-color: #555;
+        }
+
+        /* Utilitários */
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #2b2b2b;
+            color: #d4a761;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+            border-top: 2px solid #555;
+        }
+
+        /* Estilos para os menus colapsáveis */
+        .collapsible-menu {
+            margin-bottom: 10px;
+        }
+
+        .collapsible-header {
+            background-color: #333;
+            color: #d4a761;
+            padding: 15px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .collapsible-header:hover {
+            background-color: #3a3a3a;
+        }
+
+        .collapsible-header::after {
+            content: '+';
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .collapsible-header.active::after {
+            content: '-';
+        }
+
+        .collapsible-content {
+            background-color: #2b2b2b;
+            border: 1px solid #555;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+        }
+
+        .collapsible-content.show {
+            padding: 20px;
+            max-height: 2000px; /* Valor alto para acomodar o conteúdo */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Calendário de Tarefas</h1>
+    </header>
+
+    <main>
+        <section id="calendar-section">
+            <div class="calendar-nav">
+                <button id="prevMonth">&lt;</button>
+                <h2 id="currentMonthYear"></h2>
+                <button id="nextMonth">&gt;</button>
+            </div>
+            <div id="calendar-grid" class="calendar-grid">
+                <div class="day-name">Dom</div>
+                <div class="day-name">Seg</div>
+                <div class="day-name">Ter</div>
+                <div class="day-name">Qua</div>
+                <div class="day-name">Qui</div>
+                <div class="day-name">Sex</div>
+                <div class="day-name">Sáb</div>
+            </div>
+        </section>
+
+        <section id="task-input-section" class="hidden">
+            <h3>Adicionar Tarefa para <span id="selectedDate"></span></h3>
+            <input type="text" id="taskInput" placeholder="Descreva sua tarefa...">
+            <button id="saveTaskBtn">Salvar Tarefa</button>
+        </section>
+
+        <div class="collapsible-menu">
+            <div class="collapsible-header active">
+                <span>Minhas Tarefas</span>
+            </div>
+            <div class="collapsible-content show">
+                <ul id="taskList"></ul>
+            </div>
+        </div>
+
+        <div class="collapsible-menu">
+            <div class="collapsible-header">
+                <span>Gerenciamento</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="import-export-buttons">
+                    <button id="exportJsonBtn">Exportar Tarefas 💾</button>
+                    <button id="importJsonBtn">Importar Dados 📂</button>
+                    <input type="file" id="fileInput" accept=".json" class="hidden">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Tarefas Diárias. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const currentMonthYear = document.getElementById('currentMonthYear');
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            const taskInputSection = document.getElementById('task-input-section');
+            const selectedDateSpan = document.getElementById('selectedDate');
+            const taskInput = document.getElementById('taskInput');
+            const saveTaskBtn = document.getElementById('saveTaskBtn');
+            const taskList = document.getElementById('taskList');
+            const exportJsonBtn = document.getElementById('exportJsonBtn');
+            const importJsonBtn = document.getElementById('importJsonBtn');
+            const fileInput = document.getElementById('fileInput');
+
+            const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+
+            let currentMonth = new Date().getMonth();
+            let currentYear = new Date().getFullYear();
+            let selectedDay = null;
+
+            // Funções para menus colapsáveis
+            function setupCollapsibleMenus() {
+                collapsibleHeaders.forEach(header => {
+                    header.addEventListener('click', function() {
+                        this.classList.toggle('active');
+                        const content = this.nextElementSibling;
+                        content.classList.toggle('show');
+                    });
+                });
+            }
+
+            // Funções do Calendário
+            function renderCalendar() {
+                calendarGrid.innerHTML = '';
+
+                const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+                dayNames.forEach(name => {
+                    const div = document.createElement('div');
+                    div.classList.add('day-name');
+                    div.textContent = name;
+                    calendarGrid.appendChild(div);
+                });
+
+                const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+                currentMonthYear.textContent = new Date(currentYear, currentMonth).toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+
+                for (let i = 0; i < firstDayOfMonth; i++) {
+                    const div = document.createElement('div');
+                    div.classList.add('day-cell', 'empty');
+                    calendarGrid.appendChild(div);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const div = document.createElement('div');
+                    div.classList.add('day-cell');
+                    div.dataset.date = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    div.innerHTML = `<div class="day-number">${day}</div>`;
+
+                    const today = new Date();
+                    if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+                        div.classList.add('current-day');
+                    }
+
+                    const tasksForDay = getTasksByDate(div.dataset.date);
+                    if (tasksForDay.length > 0) {
+                        const badge = document.createElement('span');
+                        badge.classList.add('task-badge');
+                        badge.textContent = tasksForDay.length;
+                        div.appendChild(badge);
+                    }
+
+                    div.addEventListener('click', () => {
+                        const previouslySelected = document.querySelector('.day-cell.selected');
+                        if (previouslySelected) {
+                            previouslySelected.classList.remove('selected');
+                        }
+
+                        div.classList.add('selected');
+                        selectedDay = div.dataset.date;
+                        selectedDateSpan.textContent = new Date(selectedDay).toLocaleDateString('pt-BR');
+                        taskInputSection.classList.remove('hidden');
+                        taskInput.focus();
+                    });
+                    calendarGrid.appendChild(div);
+                }
+            }
+
+            // Funções de CRUD de Tarefas
+            function getTasks() {
+                return JSON.parse(localStorage.getItem('tasks')) || [];
+            }
+
+            function saveTasks(tasks) {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+
+            function getTasksByDate(date) {
+                const tasks = getTasks();
+                return tasks.filter(task => task.date === date);
+            }
+
+            function addTask(date, description) {
+                const tasks = getTasks();
+                const newTask = {
+                    id: Date.now(),
+                    date: date,
+                    description: description,
+                    completed: false
+                };
+                tasks.push(newTask);
+                saveTasks(tasks);
+                renderTaskList();
+                renderCalendar();
+            }
+
+            function updateTask(id, newDescription, completedStatus) {
+                const tasks = getTasks();
+                const taskIndex = tasks.findIndex(task => task.id === id);
+                if (taskIndex !== -1) {
+                    tasks[taskIndex].description = newDescription;
+                    tasks[taskIndex].completed = completedStatus;
+                    saveTasks(tasks);
+                    renderTaskList();
+                    renderCalendar();
+                }
+            }
+
+            function deleteTask(id) {
+                let tasks = getTasks();
+                tasks = tasks.filter(task => task.id !== id);
+                saveTasks(tasks);
+                renderTaskList();
+                renderCalendar();
+            }
+
+            function renderTaskList() {
+                taskList.innerHTML = '';
+                const allTasks = getTasks().sort((a, b) => {
+                    if (a.completed !== b.completed) {
+                        return a.completed ? 1 : -1;
+                    }
+                    return new Date(a.date) - new Date(b.date);
+                });
+
+                if (allTasks.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = "Nenhuma tarefa agendada. 😴";
+                    taskList.appendChild(li);
+                    return;
+                }
+
+                allTasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.dataset.taskId = task.id;
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = task.completed;
+                    checkbox.addEventListener('change', () => {
+                        li.classList.toggle('completed', checkbox.checked);
+                        updateTask(task.id, task.description, checkbox.checked);
+                        renderTaskList();
+                    });
+
+                    const taskTextSpan = document.createElement('span');
+                    taskTextSpan.classList.add('task-text');
+                    taskTextSpan.textContent = `${new Date(task.date).toLocaleDateString('pt-BR')}: ${task.description}`;
+
+                    if (task.completed) {
+                        li.classList.add('completed');
+                    }
+
+                    const taskActionsDiv = document.createElement('div');
+                    taskActionsDiv.classList.add('task-actions');
+
+                    const editBtn = document.createElement('button');
+                    editBtn.classList.add('edit-btn');
+                    editBtn.textContent = 'Editar';
+                    editBtn.addEventListener('click', () => {
+                        const newDescription = prompt('Editar tarefa:', task.description);
+                        if (newDescription !== null && newDescription.trim() !== '') {
+                            updateTask(task.id, newDescription.trim(), task.completed);
+                        }
+                    });
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Deletar';
+                    deleteBtn.addEventListener('click', () => {
+                        if (confirm(`Tem certeza que deseja deletar a tarefa "${task.description}"?`)) {
+                            deleteTask(task.id);
+                        }
+                    });
+
+                    li.appendChild(checkbox);
+                    li.appendChild(taskTextSpan);
+                    taskActionsDiv.appendChild(editBtn);
+                    taskActionsDiv.appendChild(deleteBtn);
+                    li.appendChild(taskActionsDiv);
+                    taskList.appendChild(li);
+                });
+            }
+
+            // Funções de Importação e Exportação de JSON
+            function exportData() {
+                const data = {
+                    tasks: getTasks()
+                };
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tarefas_calendario_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            function importData(jsonString) {
+                try {
+                    const data = JSON.parse(jsonString);
+                    if (data.tasks && Array.isArray(data.tasks)) {
+                        localStorage.setItem('tasks', JSON.stringify(data.tasks));
+                        
+                        renderCalendar();
+                        renderTaskList();
+                        alert('Dados importados com sucesso! ✅');
+                    } else {
+                        alert('Arquivo JSON inválido. Verifique a estrutura dos dados.');
+                    }
+                } catch (e) {
+                    alert('Erro ao processar o arquivo JSON. Certifique-se de que é um arquivo JSON válido.');
+                }
+            }
+            
+            // Event Listeners
+            prevMonthBtn.addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar();
+            });
+
+            nextMonthBtn.addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar();
+            });
+
+            saveTaskBtn.addEventListener('click', () => {
+                const description = taskInput.value.trim();
+                if (selectedDay && description) {
+                    addTask(selectedDay, description);
+                    taskInput.value = '';
+                    taskInputSection.classList.add('hidden');
+                    selectedDay = null;
+                    const previouslySelected = document.querySelector('.day-cell.selected');
+                    if (previouslySelected) {
+                        previouslySelected.classList.remove('selected');
+                    }
+                } else if (!selectedDay) {
+                    alert('Por favor, selecione um dia no calendário primeiro!');
+                } else {
+                    alert('A descrição da tarefa não pode estar vazia.');
+                }
+            });
+
+            exportJsonBtn.addEventListener('click', exportData);
+            
+            importJsonBtn.addEventListener('click', () => {
+                fileInput.click(); // Simula o clique no input de arquivo
+            });
+
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        importData(e.target.result);
+                    };
+                    reader.readAsText(file);
+                }
+            });
+
+            // Inicialização
+            setupCollapsibleMenus();
+            renderCalendar();
+            renderTaskList();
+        });
+    </script>
+</body>
+</html>

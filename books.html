@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Livros</title>
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_oza54roza54roza5.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #d4a761;
+            font-family: 'Cinzel', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 0;
+            padding: 20px; /* Adicionado para dar espaço */
+        }
+
+        .window {
+            background: #2b2b2b;
+            border: 2px solid #555;
+            border-radius: 10px;
+            width: 700px;
+            padding: 20px;
+            box-shadow: 0 0 20px #000;
+            margin-bottom: 20px;
+        }
+
+        .book-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .book-info {
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+
+        .bar-container {
+            margin-bottom: 10px;
+        }
+
+        .label {
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .bar {
+            position: relative;
+            background: #444;
+            height: 25px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .fill {
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .red, .blue, .new-bar {
+            background: #d4a761;
+        }
+
+        .range-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .value {
+            float: right;
+            margin-left: 10px;
+        }
+
+        .input-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-control input {
+            width: 80px;
+            padding: 5px;
+            background: #1a1a1a;
+            color: #d4a761;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            margin-right: 10px;
+        }
+        
+        .book-name-input {
+            width: 120px;
+            padding: 5px;
+            background: #1a1a1a;
+            color: #d4a761;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            margin-bottom: 5px;
+        }
+
+        .max-pages-input {
+            width: 50px;
+            padding: 5px;
+            background: #1a1a1a;
+            color: #d4a761;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-buttons button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #d4a761;
+            font-size: 18px;
+            transition: color 0.2s;
+        }
+        
+        .action-buttons .delete-btn:hover {
+            color: #ff4d4d;
+        }
+        
+        .action-buttons .edit-btn:hover {
+            color: #61b8ff;
+        }
+
+        #add-book-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #2b2b2b;
+            border: 2px solid #555;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #000;
+        }
+
+        #add-book-form input {
+            padding: 8px;
+            background: #1a1a1a;
+            color: #d4a761;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+        }
+
+        #add-book-form button {
+            padding: 8px 15px;
+            background: #d4a761;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+        }
+
+        .backup-controls {
+            margin-top: 20px;
+            padding: 15px;
+            background: #2b2b2b;
+            border: 2px solid #555;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #000;
+            text-align: center;
+        }
+
+        .backup-controls button, .backup-controls label {
+            padding: 8px 15px;
+            background: #d4a761;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+            margin: 5px;
+            display: inline-block;
+        }
+
+        .backup-controls input[type="file"] {
+            display: none;
+        }
+        
+        /* Estilos para os cards colapsáveis */
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 15px;
+            background: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .card-header:hover {
+            background: #3a3a3a;
+        }
+        
+        .card-header::after {
+            content: '+';
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .card-header.active::after {
+            content: '-';
+        }
+        
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: #2b2b2b;
+        }
+        
+        .card-content-inner {
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="window">
+        <div id="books-container">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-header" onclick="toggleCollapse(this)">
+                    Livro F.C.E
+                </div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <div class="book-container" id="book-1">
+                            <div class="book-info">
+                                <div class="label" id="label-1">Livro F.C.E</div>
+                                <div class="bar-container">
+                                    <div class="bar">
+                                        <div id="fill-1" class="fill red" style="width: 0%"></div>
+                                    </div>
+                                    <div class="range-info">
+                                        <span id="range-1"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-control">
+                                <input type="number" id="input-1" min="0" max="894" value="0">
+                                <div class="action-buttons">
+                                    <button class="edit-btn" id="edit-btn-1" onclick="toggleEditMode(1)">&#9998;</button>
+                                    <button class="delete-btn" onclick="deleteBook(1)">&#128465;</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-header" onclick="toggleCollapse(this)">
+                    Livro I.C.E
+                </div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <div class="book-container" id="book-2">
+                            <div class="book-info">
+                                <div class="label" id="label-2">Livro I.C.E</div>
+                                <div class="bar-container">
+                                    <div class="bar">
+                                        <div id="fill-2" class="fill blue" style="width: 0%"></div>
+                                    </div>
+                                    <div class="range-info">
+                                        <span id="range-2"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-control">
+                                <input type="number" id="input-2" min="0" max="817" value="0">
+                                <div class="action-buttons">
+                                    <button class="edit-btn" id="edit-btn-2" onclick="toggleEditMode(2)">&#9998;</button>
+                                    <button class="delete-btn" onclick="deleteBook(2)">&#128465;</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 3 (adicionei um terceiro card como exemplo) -->
+            <div class="card">
+                <div class="card-header" onclick="toggleCollapse(this)">
+                    Novo Livro *
+                </div>
+                <div class="card-content">
+                    <div class="card-content-inner">
+                        <div id="add-book-form">
+                            <input type="text" id="new-book-name" placeholder="Nome do Livro" required>
+                            <input type="number" id="new-book-max" placeholder="Páginas (Máx)" min="1" required>
+                            <button id="add-book-btn">Adicionar Livro</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="backup-controls">
+        <button id="export-btn">Exportar Backup 📤</button>
+        <label for="import-file" class="import-label">Importar Backup 📥</label>
+        <input type="file" id="import-file" accept=".json">
+    </div>
+
+    <script>
+        let bookCount = 2;
+
+        // Função para alternar o colapso dos cards
+        function toggleCollapse(header) {
+            header.classList.toggle("active");
+            const content = header.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        }
+
+        function updateBook(bookId, value) {
+            const inputElement = document.getElementById(`input-${bookId}`);
+            const fillElement = document.getElementById(`fill-${bookId}`);
+            const rangeElement = document.getElementById(`range-${bookId}`);
+
+            if (inputElement && fillElement && rangeElement) {
+                const maxValue = parseInt(inputElement.max);
+                value = Math.min(maxValue, Math.max(0, value));
+                
+                fillElement.style.width = (value / maxValue) * 100 + '%';
+                rangeElement.textContent = `${value} / ${maxValue}`;
+                inputElement.value = value;
+                
+                let bookData = JSON.parse(localStorage.getItem(`book-${bookId}`)) || {};
+                bookData.currentValue = value;
+                localStorage.setItem(`book-${bookId}`, JSON.stringify(bookData));
+            }
+        }
+
+        function deleteBook(bookId) {
+            const bookElement = document.getElementById(`book-${bookId}`);
+            if (bookElement) {
+                bookElement.remove();
+                localStorage.removeItem(`book-${bookId}`);
+            }
+        }
+
+        function toggleEditMode(bookId) {
+            const labelElement = document.getElementById(`label-${bookId}`);
+            const inputElement = document.getElementById(`input-${bookId}`);
+            const editBtn = document.getElementById(`edit-btn-${bookId}`);
+            const rangeElement = document.getElementById(`range-${bookId}`);
+            const currentMaxValue = parseInt(inputElement.max);
+
+            if (editBtn.textContent.trim() === '✏') {
+                const currentLabel = labelElement.textContent;
+                labelElement.innerHTML = `<input type="text" class="book-name-input" id="edit-label-${bookId}" value="${currentLabel}">`;
+                rangeElement.innerHTML = `Páginas (Máx): <input type="number" class="max-pages-input" id="edit-max-${bookId}" value="${currentMaxValue}">`;
+                editBtn.textContent = '✔';
+            } else {
+                const newLabelInput = document.getElementById(`edit-label-${bookId}`);
+                const newMaxPagesInput = document.getElementById(`edit-max-${bookId}`);
+                
+                const newLabel = newLabelInput.value;
+                const newMaxPages = parseInt(newMaxPagesInput.value) || currentMaxValue;
+
+                labelElement.textContent = newLabel;
+                inputElement.max = newMaxPages;
+                
+                let bookData = JSON.parse(localStorage.getItem(`book-${bookId}`)) || {};
+                bookData.label = newLabel;
+                bookData.maxValue = newMaxPages;
+                localStorage.setItem(`book-${bookId}`, JSON.stringify(bookData));
+
+                updateBook(bookId, inputElement.value);
+                editBtn.textContent = '✏';
+            }
+        }
+
+        function clearBooksFromDOM() {
+            const booksContainer = document.getElementById('books-container');
+            const children = Array.from(booksContainer.children);
+            children.forEach(child => {
+                if (child.id !== 'book-1' && child.id !== 'book-2') {
+                    booksContainer.removeChild(child);
+                }
+            });
+        }
+
+        function loadBooks() {
+            let lastBookId = parseInt(localStorage.getItem('lastBookId')) || 2;
+            bookCount = lastBookId;
+            
+            let book1Data = JSON.parse(localStorage.getItem(`book-1`));
+            if (!book1Data) {
+                book1Data = { label: 'Livro F.C.E', maxValue: 894, currentValue: 0, colorClass: 'red' };
+                localStorage.setItem('book-1', JSON.stringify(book1Data));
+            }
+            document.getElementById('label-1').textContent = book1Data.label;
+            document.getElementById('input-1').max = book1Data.maxValue;
+            updateBook(1, book1Data.currentValue);
+
+            let book2Data = JSON.parse(localStorage.getItem(`book-2`));
+            if (!book2Data) {
+                book2Data = { label: 'Livro I.C.E', maxValue: 817, currentValue: 0, colorClass: 'blue' };
+                localStorage.setItem('book-2', JSON.stringify(book2Data));
+            }
+            document.getElementById('label-2').textContent = book2Data.label;
+            document.getElementById('input-2').max = book2Data.maxValue;
+            updateBook(2, book2Data.currentValue);
+
+            for (let i = 3; i <= bookCount; i++) {
+                const bookData = JSON.parse(localStorage.getItem(`book-${i}`));
+                if (bookData) {
+                    addBook(bookData, i);
+                }
+            }
+            
+            // Abre o primeiro card por padrão
+            const firstCardHeader = document.querySelector('.card-header');
+            if (firstCardHeader) {
+                toggleCollapse(firstCardHeader);
+            }
+        }
+
+        function addBook(bookData = null, bookId = null) {
+            if (bookId === null) {
+                bookCount++;
+                bookId = bookCount;
+            } else {
+                bookCount = Math.max(bookCount, bookId);
+            }
+
+            const newLabel = bookData ? bookData.label : document.getElementById('new-book-name').value;
+            const newMaxValue = bookData ? bookData.maxValue : parseInt(document.getElementById('new-book-max').value);
+            const newCurrentValue = bookData ? bookData.currentValue : 0;
+            const newColorClass = bookData ? bookData.colorClass || 'new-bar' : 'new-bar';
+
+            if (!newLabel || isNaN(newMaxValue) || newMaxValue <= 0) {
+                if (!bookData) {
+                    alert("Por favor, preencha o nome do livro e o número máximo de páginas (deve ser maior que 0).");
+                }
+                return;
+            }
+
+            const booksContainer = document.getElementById('books-container');
+
+            const newBookHTML = `
+                <div class="card">
+                    <div class="card-header" onclick="toggleCollapse(this)">
+                        ${newLabel}
+                    </div>
+                    <div class="card-content">
+                        <div class="card-content-inner">
+                            <div class="book-container" id="book-${bookId}">
+                                <div class="book-info">
+                                    <div class="label" id="label-${bookId}">${newLabel}</div>
+                                    <div class="bar-container">
+                                        <div class="bar">
+                                            <div id="fill-${bookId}" class="fill ${newColorClass}" style="width: 0%"></div>
+                                        </div>
+                                        <div class="range-info">
+                                            <span id="range-${bookId}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="input-control">
+                                    <input type="number" id="input-${bookId}" min="0" max="${newMaxValue}" value="${newCurrentValue}">
+                                    <div class="action-buttons">
+                                        <button class="edit-btn" id="edit-btn-${bookId}" onclick="toggleEditMode(${bookId})">&#9998;</button>
+                                        <button class="delete-btn" onclick="deleteBook(${bookId})">&#128465;</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            booksContainer.insertAdjacentHTML('beforeend', newBookHTML);
+            
+            document.getElementById(`input-${bookId}`).addEventListener('input', (e) => {
+                updateBook(bookId, e.target.value);
+            });
+            
+            if (!bookData) {
+                const initialData = {
+                    label: newLabel,
+                    maxValue: newMaxValue,
+                    currentValue: newCurrentValue,
+                    colorClass: newColorClass
+                };
+                localStorage.setItem(`book-${bookId}`, JSON.stringify(initialData));
+                localStorage.setItem('lastBookId', bookId);
+                document.getElementById('new-book-name').value = '';
+                document.getElementById('new-book-max').value = '';
+            }
+            
+            updateBook(bookId, newCurrentValue);
+        }
+
+        // --- Funções de Backup (Importar e Exportar) ---
+        function exportBackup() {
+            const allBooks = {};
+            for (let i = 3; i <= bookCount; i++) {
+                const bookData = localStorage.getItem(`book-${i}`);
+                if (bookData) {
+                    allBooks[`book-${i}`] = JSON.parse(bookData);
+                }
+            }
+            
+            allBooks.lastBookId = bookCount;
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allBooks, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "backup_livros.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importBackup(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    if (!confirm("Isso irá substituir apenas os seus livros customizados. Os livros padrão serão mantidos. Deseja continuar?")) {
+                        return;
+                    }
+                    
+                    for (let i = 3; i <= bookCount; i++) {
+                        localStorage.removeItem(`book-${i}`);
+                    }
+                    clearBooksFromDOM();
+                    
+                    if (data.lastBookId) {
+                        localStorage.setItem('lastBookId', data.lastBookId);
+                    }
+                    
+                    for (const key in data) {
+                        if (key.startsWith('book-')) {
+                            localStorage.setItem(key, JSON.stringify(data[key]));
+                        }
+                    }
+                    
+                    loadBooks();
+                    alert("Backup importado com sucesso! Os livros customizados foram restaurados.");
+                } catch (error) {
+                    alert("Erro ao importar o arquivo. Certifique-se de que é um arquivo JSON válido.");
+                    console.error("Erro de importação:", error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- Event Listeners ---
+        document.getElementById('input-1').addEventListener('input', (e) => updateBook(1, e.target.value));
+        document.getElementById('input-2').addEventListener('input', (e) => updateBook(2, e.target.value));
+        document.getElementById('add-book-btn').addEventListener('click', () => addBook());
+        document.getElementById('export-btn').addEventListener('click', exportBackup);
+        document.getElementById('import-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                importBackup(file);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadBooks);
+    </script>
+</body>
+</html>

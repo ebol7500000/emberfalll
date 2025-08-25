@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciador de Checklists Dinâmico</title>
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_oza54roza54roza5.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-medium: #2b2b2b;
+            --bg-light: #333;
+            --border-color: #555;
+            --accent-color: #d4a761;
+            --text-color: #ccc;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            background: var(--bg-dark);
+            color: var(--accent-color);
+            font-family: 'Cinzel', serif;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Accordion Styles --- */
+        .accordion {
+            background: var(--bg-medium);
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .accordion-header {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            transition: background 0.3s;
+        }
+
+        .accordion-header:hover {
+            background: var(--bg-light);
+        }
+
+        .accordion-header::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s;
+        }
+
+        .accordion-header.active::after {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-content-inner {
+            padding: 0 20px 20px;
+        }
+
+        /* --- Formulário para Adicionar Nova Coluna --- */
+        .add-checklist-form {
+            background: var(--bg-medium);
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-checklist-form h3 {
+            width: 100%;
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+
+        .form-input {
+            background-color: var(--bg-light);
+            color: var(--accent-color);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 5px;
+            font-family: 'Cinzel', serif;
+            width: 150px;
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .form-button {
+            background-color: var(--accent-color);
+            color: var(--bg-dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+            transition: transform 0.2s;
+        }
+        .form-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- Container das Colunas --- */
+        .checklists-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .secao {
+            background: var(--bg-medium);
+            padding: 15px;
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            border: 2px solid var(--border-color);
+            width: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+        
+        .secao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 0;
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 1.1em;
+            cursor: pointer;
+            flex-grow: 1;
+        }
+        
+        .title-input {
+            width: 100%;
+            font-size: 1.1em;
+            text-align: center;
+            display: none;
+        }
+
+        .delete-checklist-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+        .delete-checklist-btn:hover {
+            color: #ff5555;
+        }
+
+        .lista {
+            background: var(--bg-light);
+            padding: 10px;
+            border-radius: 10px;
+            height: 60vh;
+            overflow-y: auto;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: var(--text-color);
+            word-break: break-all;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        
+        /* Barra de Progresso */
+        .pilar-container {
+            width: 100%;
+            height: 25px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .pilar-preenchido {
+            height: 100%;
+            background: var(--accent-color);
+            transition: width 0.4s ease;
+        }
+
+        .pilar-texto {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--bg-dark);
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        /* CRUD de Itens */
+        .crud-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .crud-item {
+            display: flex;
+            gap: 5px;
+        }
+        .crud-input {
+            width: 100%;
+        }
+
+        /* Botões de Importação/Exportação */
+        .io-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Accordion para adicionar nova checklist -->
+        <div class="accordion">
+            <div class="accordion-header">Adicionar Nova Checklist</div>
+            <div class="accordion-content">
+                <div class="accordion-content-inner">
+                    <div class="add-checklist-form">
+                        <h3>Adicionar Nova Coluna de Checklist</h3>
+                        <input type="text" id="new-checklist-title" class="form-input" placeholder="Nome do Livro/Coluna">
+                        <input type="number" id="new-checklist-start" class="form-input" placeholder="Nº Inicial">
+                        <input type="number" id="new-checklist-end" class="form-input" placeholder="Nº Final">
+                        <button id="add-checklist-btn" class="form-button">Criar Coluna</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accordion para gerenciamento JSON -->
+        <div class="accordion">
+            <div class="accordion-header">Gerenciamento de Dados (JSON)</div>
+            <div class="accordion-content">
+                <div class="accordion-content-inner">
+                    <div class="io-buttons">
+                        <button id="export-btn" class="form-button">Exportar JSON</button>
+                        <button id="import-btn" class="form-button">Importar JSON</button>
+                        <input type="file" id="import-file" style="display: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="checklists-container" id="checklists-container">
+            <!-- As checklists serão renderizadas aqui -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checklistsContainer = document.getElementById('checklists-container');
+            const addChecklistBtn = document.getElementById('add-checklist-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const importBtn = document.getElementById('import-btn');
+            const importFile = document.getElementById('import-file');
+
+            // --- Accordion Functionality ---
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const accordion = header.parentElement;
+                    const content = header.nextElementSibling;
+                    
+                    header.classList.toggle('active');
+                    
+                    if (header.classList.contains('active')) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    } else {
+                        content.style.maxHeight = '0';
+                    }
+                });
+            });
+
+            // --- Gerenciamento de Estado ---
+            
+            function getChecklists() {
+                const data = localStorage.getItem('checklists');
+                if (data) {
+                    try {
+                        const parsedData = JSON.parse(data);
+                        return Array.isArray(parsedData) ? parsedData : [];
+                    } catch (e) {
+                        console.error('Erro ao fazer parse dos dados do localStorage:', e);
+                        return [];
+                    }
+                }
+                return [
+                    { id: 'fce', title: 'Livro F.C.E', items: generateItems(0, 894, 4) },
+                    { id: 'ice', title: 'Livro I.C.E', items: generateItems(0, 817, 1) }
+                ];
+            }
+
+            function saveChecklists(checklists) {
+                localStorage.setItem('checklists', JSON.stringify(checklists));
+            }
+            
+            function generateItems(start, end, step) {
+                const items = [];
+                for (let i = start; i <= end; i += step) {
+                    items.push({ num: i, checked: false });
+                }
+                return items;
+            }
+
+            // --- Renderização da UI ---
+
+            function renderChecklists() {
+                const checklists = getChecklists();
+                checklistsContainer.innerHTML = '';
+
+                checklists.forEach(checklist => {
+                    // Cria o accordion para cada checklist
+                    const accordion = document.createElement('div');
+                    accordion.className = 'accordion';
+                    accordion.dataset.id = checklist.id;
+                    
+                    // Cria o header do accordion
+                    const accordionHeader = document.createElement('div');
+                    accordionHeader.className = 'accordion-header';
+                    accordionHeader.textContent = checklist.title;
+                    
+                    // Cria o conteúdo do accordion
+                    const accordionContent = document.createElement('div');
+                    accordionContent.className = 'accordion-content';
+                    
+                    const contentInner = document.createElement('div');
+                    contentInner.className = 'accordion-content-inner';
+                    
+                    // Adiciona a seção da checklist dentro do accordion
+                    contentInner.innerHTML = `
+                        <div class="secao">
+                            <div class="secao-header">
+                                <h2 class="checklist-title">${checklist.title}</h2>
+                                <input type="text" class="form-input title-input" value="${checklist.title}" />
+                                <button class="delete-checklist-btn" title="Excluir esta coluna">✖</button>
+                            </div>
+                            <div class="lista"></div>
+                            <div class="pilar-container">
+                                <div class="pilar-preenchido"></div>
+                                <span class="pilar-texto"></span>
+                            </div>
+                            <div class="crud-container">
+                                <div class="crud-item">
+                                    <input type="number" class="form-input crud-input add-item-input" placeholder="Nº do item">
+                                    <button class="form-button add-item-btn">Add</button>
+                                </div>
+                                <div class="crud-item">
+                                    <input type="number" class="form-input crud-input remove-item-input" placeholder="Nº do item">
+                                    <button class="form-button remove-item-btn">Del</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    accordionContent.appendChild(contentInner);
+                    accordion.appendChild(accordionHeader);
+                    accordion.appendChild(accordionContent);
+                    checklistsContainer.appendChild(accordion);
+                    
+                    // Adiciona evento de clique para o header do accordion
+                    accordionHeader.addEventListener('click', function() {
+                        this.classList.toggle('active');
+                        const content = this.nextElementSibling;
+                        
+                        if (this.classList.contains('active')) {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                        } else {
+                            content.style.maxHeight = '0';
+                        }
+                    });
+                    
+                    // Abre o primeiro accordion por padrão
+                    if (checklists.indexOf(checklist) === 0) {
+                        accordionHeader.classList.add('active');
+                        accordionContent.style.maxHeight = accordionContent.scrollHeight + 'px';
+                    }
+                    
+                    renderItems(checklist.id);
+                    updatePilar(checklist.id);
+                });
+            }
+            
+            function renderItems(checklistId) {
+                const checklists = getChecklists();
+                const checklist = checklists.find(c => c.id === checklistId);
+                const accordion = document.querySelector(`.accordion[data-id="${checklistId}"]`);
+                const listaContainer = accordion ? accordion.querySelector('.lista') : null;
+                
+                if (!checklist || !listaContainer) return;
+
+                listaContainer.innerHTML = '';
+                
+                const sortedItems = [...checklist.items].sort((a, b) => a.num - b.num);
+                
+                sortedItems.forEach(item => {
+                    const label = document.createElement('label');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = item.checked;
+                    checkbox.dataset.num = item.num;
+
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(`Item ${item.num}`));
+                    listaContainer.appendChild(label);
+                });
+            }
+            
+            function updatePilar(checklistId) {
+                const checklists = getChecklists();
+                const checklist = checklists.find(c => c.id === checklistId);
+                const accordion = document.querySelector(`.accordion[data-id="${checklistId}"]`);
+                
+                if (!checklist || !accordion) return;
+                
+                const pilarPreenchido = accordion.querySelector('.pilar-preenchido');
+                const pilarTexto = accordion.querySelector('.pilar-texto');
+
+                const totalItems = checklist.items.length;
+                const checkedItems = checklist.items.filter(item => item.checked).length;
+                
+                const percentage = totalItems > 0 ? (checkedItems / totalItems) * 100 : 0;
+                
+                pilarPreenchido.style.width = `${percentage}%`;
+                pilarTexto.textContent = `${checkedItems} / ${totalItems}`;
+            }
+
+            // --- Lógica de Eventos ---
+
+            addChecklistBtn.addEventListener('click', () => {
+                const titleInput = document.getElementById('new-checklist-title');
+                const startInput = document.getElementById('new-checklist-start');
+                const endInput = document.getElementById('new-checklist-end');
+
+                const title = titleInput.value.trim();
+                const start = parseInt(startInput.value);
+                const end = parseInt(endInput.value);
+
+                if (!title || isNaN(start) || isNaN(end) || start > end) {
+                    alert('Por favor, preencha todos os campos corretamente. O número inicial não pode ser maior que o final.');
+                    return;
+                }
+                
+                const checklists = getChecklists();
+                const newChecklist = {
+                    id: `checklist-${Date.now()}`,
+                    title: title,
+                    items: generateItems(start, end, 1)
+                };
+
+                checklists.push(newChecklist);
+                saveChecklists(checklists);
+                renderChecklists();
+
+                titleInput.value = '';
+                startInput.value = '';
+                endInput.value = '';
+            });
+            
+            // Delegação de eventos para os accordions das checklists
+            checklistsContainer.addEventListener('click', (e) => {
+                const target = e.target;
+                const accordion = target.closest('.accordion');
+                if (!accordion) return;
+                
+                const checklistId = accordion.dataset.id;
+                let checklists = getChecklists();
+                let checklist = checklists.find(c => c.id === checklistId);
+                const secao = accordion.querySelector('.secao');
+
+                // Marcar/Desmarcar um item
+                if (target.type === 'checkbox') {
+                    const itemNum = parseInt(target.dataset.num);
+                    const item = checklist.items.find(i => i.num === itemNum);
+                    if (item) {
+                        item.checked = target.checked;
+                        saveChecklists(checklists);
+                        updatePilar(checklistId);
+                    }
+                }
+                
+                // Adicionar um item
+                if (target.classList.contains('add-item-btn')) {
+                    const input = secao.querySelector('.add-item-input');
+                    const num = parseInt(input.value);
+                    if (!isNaN(num) && !checklist.items.some(i => i.num === num)) {
+                        checklist.items.push({ num: num, checked: false });
+                        saveChecklists(checklists);
+                        renderItems(checklistId);
+                        updatePilar(checklistId);
+                        input.value = '';
+                    } else {
+                        alert('Número de item inválido ou já existente.');
+                    }
+                }
+
+                // Remover um item
+                if (target.classList.contains('remove-item-btn')) {
+                    const input = secao.querySelector('.remove-item-input');
+                    const num = parseInt(input.value);
+                    const initialLength = checklist.items.length;
+                    checklist.items = checklist.items.filter(i => i.num !== num);
+                    if(checklist.items.length < initialLength) {
+                        saveChecklists(checklists);
+                        renderItems(checklistId);
+                        updatePilar(checklistId);
+                        input.value = '';
+                    } else {
+                        alert('Item não encontrado.');
+                    }
+                }
+
+                // Excluir a coluna inteira
+                if (target.classList.contains('delete-checklist-btn')) {
+                    if (confirm(`Tem certeza que deseja excluir a coluna "${checklist.title}"?`)) {
+                        const updatedChecklists = checklists.filter(c => c.id !== checklistId);
+                        saveChecklists(updatedChecklists);
+                        renderChecklists();
+                    }
+                }
+                
+                // Clicar no título para editar
+                if (target.classList.contains('checklist-title')) {
+                    const titleInput = secao.querySelector('.title-input');
+                    target.style.display = 'none';
+                    titleInput.style.display = 'block';
+                    titleInput.focus();
+                    titleInput.select();
+                }
+            });
+
+            // Eventos para salvar a edição do título
+            checklistsContainer.addEventListener('focusout', (e) => {
+                if (e.target.classList.contains('title-input')) {
+                    saveTitle(e.target);
+                }
+            });
+
+            checklistsContainer.addEventListener('keydown', (e) => {
+                if (e.target.classList.contains('title-input') && e.key === 'Enter') {
+                    saveTitle(e.target);
+                }
+            });
+            
+            function saveTitle(inputElement) {
+                const accordion = inputElement.closest('.accordion');
+                const checklistId = accordion.dataset.id;
+                const newTitle = inputElement.value.trim();
+                const h2 = accordion.querySelector('.checklist-title');
+                const accordionHeader = accordion.querySelector('.accordion-header');
+
+                if (newTitle) {
+                    let checklists = getChecklists();
+                    let checklist = checklists.find(c => c.id === checklistId);
+                    checklist.title = newTitle;
+                    saveChecklists(checklists);
+                    h2.textContent = newTitle;
+                    accordionHeader.textContent = newTitle;
+                }
+                
+                inputElement.style.display = 'none';
+                h2.style.display = 'block';
+            }
+
+            // --- Funções de Importação e Exportação ---
+
+            exportBtn.addEventListener('click', () => {
+                const checklists = getChecklists();
+                const dataStr = JSON.stringify(checklists, null, 2);
+                const blob = new Blob([dataStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'checklists_backup.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            importBtn.addEventListener('click', () => {
+                importFile.click();
+            });
+
+            importFile.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        if (Array.isArray(importedData)) {
+                            if (confirm('Atenção: A importação irá substituir todos os dados atuais. Deseja continuar?')) {
+                                saveChecklists(importedData);
+                                renderChecklists();
+                                alert('Dados importados com sucesso!');
+                            }
+                        } else {
+                            alert('Formato de arquivo JSON inválido. Por favor, selecione um arquivo válido.');
+                        }
+                    } catch (error) {
+                        alert('Erro ao processar o arquivo JSON. Certifique-se de que é um arquivo JSON válido.');
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // --- Inicialização ---
+            renderChecklists();
+        });
+    </script>
+</body>
+</html>

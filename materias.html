@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Matérias</title>
+    <link rel="icon" type="image/png" href=".././Gemini_Generated_Image_oza54roza54roza5.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            font-family: 'Cinzel', serif;
+            color: #d4a761;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .enemy-card {
+            background: #2b2b2b;
+            border: 2px solid #555;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .enemy-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            margin-right: 20px;
+            object-fit: cover;
+            border: 2px solid #555;
+        }
+
+        .enemy-info {
+            flex-grow: 1;
+        }
+
+        .enemy-name {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .life-bar-container {
+            background-color: #333;
+            border: 1px solid #555;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .life-bar {
+            height: 100%;
+            background-color: #d4a761;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .life-input {
+            margin-top: 10px;
+            width: 60px;
+            padding: 4px;
+            background: #1a1a1a;
+            color: #d4a761;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+        }
+
+        label {
+            font-size: 0.9em;
+            margin-right: 5px;
+            color: #ccc;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .add-form, .io-buttons {
+            background: #2b2b2b;
+            border: 2px solid #555;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 460px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .add-form input {
+            background: #1a1a1a;
+            color: #d4a761;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 8px;
+            font-family: 'Cinzel', serif;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .add-form button, .io-buttons button {
+            background-color: #d4a761;
+            color: #1a1a1a;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            transition: background-color 0.2s;
+        }
+
+        .add-form button:hover, .io-buttons button:hover {
+            background-color: #c09455;
+        }
+        
+        .delete-btn, .edit-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .delete-btn:hover {
+            color: #ff4d4d;
+        }
+
+        .edit-btn:hover {
+            color: #d4a761;
+        }
+
+        .enemy-name-input {
+            background: #1a1a1a;
+            color: #d4a761;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* Estilos para os menus collapse */
+        .collapse-menu {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 15px;
+        }
+
+        .collapse-header {
+            background: #2b2b2b;
+            border: 2px solid #555;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            transition: background-color 0.3s;
+        }
+
+        .collapse-header:hover {
+            background-color: #333;
+        }
+
+        .collapse-header::after {
+            content: '+';
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+
+        .collapse-header.active::after {
+            content: '-';
+        }
+
+        .collapse-content {
+            background: #2b2b2b;
+            border: 2px solid #555;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .collapse-content.active {
+            padding: 20px;
+            max-height: 1000px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Matérias</h1>
+
+    <!-- Menu Collapse para Matérias -->
+    <div class="collapse-menu">
+        <div class="collapse-header active">
+            Matérias
+        </div>
+        <div class="collapse-content active">
+            <div id="materiaContainer" class="container"></div>
+        </div>
+    </div>
+
+    <!-- Menu Collapse para Adicionar Matéria -->
+    <div class="collapse-menu">
+        <div class="collapse-header">
+            Adicionar Matéria
+        </div>
+        <div class="collapse-content">
+            <div class="add-form">
+                <h3>Adicionar Nova Matéria</h3>
+                <input type="text" id="addMateriaName" placeholder="Nome da matéria">
+                <input type="number" id="addMateriaMaxLife" placeholder="Vida máxima (ex: 45)">
+                <button id="addMateriaBtn">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Collapse para Gerenciador de Backup -->
+    <div class="collapse-menu">
+        <div class="collapse-header">
+            Gerenciador de Backup
+        </div>
+        <div class="collapse-content">
+            <div class="io-buttons">
+                <h3>Importar / Exportar Dados</h3>
+                <button id="exportBtn">Exportar para JSON</button>
+                <button id="importBtn">Importar do JSON</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const materiaContainer = document.getElementById('materiaContainer');
+        const addMateriaBtn = document.getElementById('addMateriaBtn');
+        const addMateriaNameInput = document.getElementById('addMateriaName');
+        const addMateriaMaxLifeInput = document.getElementById('addMateriaMaxLife');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importFile = document.getElementById('importFile');
+
+        let materias = JSON.parse(localStorage.getItem('materias')) || [
+            { id: Date.now(), name: 'Fisica PC', maxLife: 45, currentLife: 45 }
+        ];
+
+        // Função para inicializar os menus collapse
+        function initCollapseMenus() {
+            const headers = document.querySelectorAll('.collapse-header');
+            
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    header.classList.toggle('active');
+                    const content = header.nextElementSibling;
+                    content.classList.toggle('active');
+                    
+                    if (content.classList.contains('active')) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    } else {
+                        content.style.maxHeight = '0';
+                    }
+                });
+            });
+        }
+
+        function saveMaterias() {
+            localStorage.setItem('materias', JSON.stringify(materias));
+        }
+
+        function createMateriaCard(materia) {
+            const card = document.createElement('div');
+            card.classList.add('enemy-card');
+            card.dataset.id = materia.id;
+
+            const currentLife = materia.currentLife !== undefined ? materia.currentLife : materia.maxLife;
+            const percent = Math.max(0, Math.min(100, (currentLife / materia.maxLife) * 100));
+
+            card.innerHTML = `
+                <div class="enemy-info">
+                    <div class="enemy-name">${materia.name}</div>
+                    <div class="life-bar-container">
+                        <div class="life-bar" style="width: ${percent}%;"></div>
+                    </div>
+                    <div style="margin-top: 8px; display: flex; align-items: center;">
+                        <label for="lifeInput-${materia.id}">Vida:</label>
+                        <input type="number" id="lifeInput-${materia.id}" class="life-input" min="0" max="${materia.maxLife}" value="${currentLife}">
+                        <span style="margin-left: 5px; color: #ccc;">/ ${materia.maxLife}</span>
+                    </div>
+                    <div class="controls">
+                        <button class="edit-btn" data-id="${materia.id}">✏️</button>
+                        <button class="delete-btn" data-id="${materia.id}">🗑️</button>
+                    </div>
+                </div>
+            `;
+
+            const lifeInput = card.querySelector(`#lifeInput-${materia.id}`);
+            const lifeBar = card.querySelector('.life-bar');
+            const nameElement = card.querySelector('.enemy-name');
+            const editBtn = card.querySelector('.edit-btn');
+            const deleteBtn = card.querySelector('.delete-btn');
+
+            lifeInput.addEventListener('input', () => {
+                let val = parseInt(lifeInput.value);
+                if (isNaN(val)) val = 0;
+                val = Math.max(0, Math.min(materia.maxLife, val));
+                lifeInput.value = val;
+                const newPercent = Math.max(0, Math.min(100, (val / materia.maxLife) * 100));
+                lifeBar.style.width = newPercent + "%";
+                materia.currentLife = val;
+                saveMaterias();
+            });
+
+            deleteBtn.addEventListener('click', () => {
+                materias = materias.filter(m => m.id !== materia.id);
+                saveMaterias();
+                renderMaterias();
+            });
+
+            editBtn.addEventListener('click', () => {
+                if (editBtn.textContent === '✏️') {
+                    const newNameInput = document.createElement('input');
+                    newNameInput.classList.add('enemy-name-input');
+                    newNameInput.value = materia.name;
+                    nameElement.replaceWith(newNameInput);
+                    editBtn.textContent = '✔️';
+                } else {
+                    const newNameInput = card.querySelector('.enemy-name-input');
+                    materia.name = newNameInput.value;
+
+                    const newNameElement = document.createElement('div');
+                    newNameElement.classList.add('enemy-name');
+                    newNameElement.textContent = materia.name;
+                    newNameInput.replaceWith(newNameElement);
+                    editBtn.textContent = '✏️';
+                    saveMaterias();
+                }
+            });
+
+            return card;
+        }
+
+        function renderMaterias() {
+            materiaContainer.innerHTML = '';
+            materias.forEach(materia => {
+                const card = createMateriaCard(materia);
+                materiaContainer.appendChild(card);
+            });
+        }
+
+        addMateriaBtn.addEventListener('click', () => {
+            const name = addMateriaNameInput.value.trim();
+            const maxLife = parseInt(addMateriaMaxLifeInput.value);
+
+            if (name && !isNaN(maxLife) && maxLife > 0) {
+                const newMateria = {
+                    id: Date.now(),
+                    name: name,
+                    maxLife: maxLife,
+                    currentLife: maxLife
+                };
+                materias.push(newMateria);
+                saveMaterias();
+                renderMaterias();
+
+                addMateriaNameInput.value = '';
+                addMateriaMaxLifeInput.value = '';
+            } else {
+                alert('Por favor, preencha o nome e a vida máxima da matéria corretamente.');
+            }
+        });
+
+        // --- Funções de Import e Export JSON ---
+
+        function exportMaterias() {
+            const dataStr = JSON.stringify(materias, null, 2); // O null e 2 formatam o JSON
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'materias.json';
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function importMaterias(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        // Validação simples para garantir que a estrutura é um array de objetos
+                        materias = importedData;
+                        saveMaterias();
+                        renderMaterias();
+                        alert('Dados importados com sucesso!');
+                    } else {
+                        alert('Arquivo JSON inválido. Por favor, selecione um arquivo com um array de matérias.');
+                    }
+                } catch (error) {
+                    alert('Erro ao processar o arquivo. Verifique se é um JSON válido.');
+                    console.error('Erro de importação:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        exportBtn.addEventListener('click', exportMaterias);
+        importBtn.addEventListener('click', () => {
+            importFile.click(); // Simula o clique no input de arquivo
+        });
+        importFile.addEventListener('change', importMaterias);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMaterias();
+            initCollapseMenus();
+        });
+    </script>
+</body>
+</html>

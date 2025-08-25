@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poção Mágica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #1a1a1a;
+            font-family: 'Cinzel', serif;
+            color: #d4a761;
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos dos menus colapsáveis */
+        .collapsible-menu {
+            width: 90%;
+            max-width: 1200px;
+            margin-bottom: 15px;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #222;
+            border: 1px solid #333;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .menu-header:hover {
+            background-color: #2a2a2a;
+        }
+
+        .menu-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+        }
+
+        .menu-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+
+        .menu-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #222;
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+            border-bottom: 1px solid #333;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .menu-content.open {
+            max-height: 2000px; /* Valor alto para acomodar o conteúdo */
+        }
+
+        .menu-content-inner {
+            padding: 20px;
+        }
+
+        .rotate {
+            transform: rotate(90deg);
+        }
+
+        /* Seção de Poções */
+        #potions-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        .potion-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background-color: #222;
+            position: relative;
+        }
+
+        .potion-wrapper {
+            position: relative;
+            width: 150px;
+            height: 300px;
+        }
+
+        .potion-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .potion-container-rect {
+            fill: none;
+            stroke: #555;
+            stroke-width: 2;
+        }
+
+        .potion-liquid-rect {
+            fill: #d4a761;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .level-display {
+            font-size: 2em;
+            font-weight: bold;
+            color: #d4a761;
+            width: 80px;
+            text-align: center;
+        }
+
+        .max-level-input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #d4a761;
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+        }
+
+        .btn {
+            background-color: #333;
+            color: #d4a761;
+            border: 1px solid #555;
+            padding: 10px 15px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            font-family: 'Cinzel', serif;
+        }
+
+        .btn:hover {
+            background-color: #555;
+        }
+
+        .btn.reset {
+            background-color: #444;
+        }
+
+        .btn.reset:hover {
+            background-color: #666;
+        }
+        
+        .btn.delete {
+            background-color: #a74747;
+            color: #fff;
+            border: 1px solid #853737;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .btn.delete:hover {
+            background-color: #c05151;
+        }
+
+        /* Seção de Backup */
+        .backup-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn.export {
+            background-color: #333;
+            color: #d4a761;
+            border: 1px solid #555;
+        }
+
+        .btn.export:hover {
+            background-color: #555;
+        }
+
+        .btn.import {
+            background-color: #000;
+            color: #d4a761;
+            border: 1px solid #555;
+        }
+
+        .btn.import:hover {
+            background-color: #222;
+        }
+
+        .btn.clear-all {
+            background-color: #d4a761;
+            color: #000;
+            border: 1px solid #b38f4f;
+        }
+
+        .btn.clear-all:hover {
+            background-color: #e6b84d;
+        }
+
+        #file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Poções Mágicas</h1>
+    
+    <!-- Menu 1: Poções -->
+    <div class="collapsible-menu">
+        <div class="menu-header" onclick="toggleMenu(this)">
+            <h2>Poções</h2>
+            <span class="menu-icon">›</span>
+        </div>
+        <div class="menu-content">
+            <div class="menu-content-inner">
+                <div id="potions-container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Menu 2: Adicionar Poção -->
+    <div class="collapsible-menu">
+        <div class="menu-header" onclick="toggleMenu(this)">
+            <h2>Adicionar Poção</h2>
+            <span class="menu-icon">›</span>
+        </div>
+        <div class="menu-content">
+            <div class="menu-content-inner" style="text-align: center;">
+                <button id="add-potion-btn" class="btn">Adicionar Poção</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Menu 3: Gerenciamento de Backup -->
+    <div class="collapsible-menu">
+        <div class="menu-header" onclick="toggleMenu(this)">
+            <h2>Gerenciamento de Backup</h2>
+            <span class="menu-icon">›</span>
+        </div>
+        <div class="menu-content">
+            <div class="menu-content-inner" style="text-align: center;">
+                <div class="backup-container">
+                    <button id="export-btn" class="btn export">Exportar Poções</button>
+                    <button id="import-btn" class="btn import">Importar Poções</button>
+                    <button id="clear-all-btn" class="btn clear-all">Limpar Tudo</button>
+                    <input type="file" id="file-input" accept=".json">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para alternar menus colapsáveis
+        function toggleMenu(header) {
+            const menuContent = header.nextElementSibling;
+            const icon = header.querySelector('.menu-icon');
+            
+            menuContent.classList.toggle('open');
+            icon.classList.toggle('rotate');
+        }
+
+        // Inicializa todos os menus como abertos por padrão
+        document.addEventListener('DOMContentLoaded', function() {
+            const menus = document.querySelectorAll('.menu-header');
+            menus.forEach(menu => {
+                toggleMenu(menu); // Abre o menu
+                toggleMenu(menu); // Fecha o menu (para garantir que comecem fechados)
+            });
+        });
+
+        const potionsContainer = document.getElementById('potions-container');
+        const addPotionBtn = document.getElementById('add-potion-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const fileInput = document.getElementById('file-input');
+
+        let potionIdCounter = 0;
+
+        class Potion {
+            constructor(id, initialLevel = 0, initialMax = 8) {
+                this.id = id;
+                this.currentLevel = initialLevel;
+                this.totalParts = initialMax;
+
+                this.createElement();
+                this.updatePotionFill();
+                this.addEventListeners();
+            }
+
+            createElement() {
+                this.potionCard = document.createElement('div');
+                this.potionCard.className = 'potion-card';
+                this.potionCard.innerHTML = `
+                    <button class="btn delete-btn">Excluir</button>
+                    <div class="potion-wrapper">
+                        <svg class="potion-svg" viewBox="0 0 100 200" preserveAspectRatio="xMidYMid meet">
+                            <rect class="potion-container-rect" x="25" y="25" width="50" height="150" rx="5" ry="5" />
+                            <rect class="potion-liquid-rect" x="25" y="175" width="50" height="0" />
+                        </svg>
+                    </div>
+                    <div class="controls">
+                        <button class="btn decrement-btn">-</button>
+                        <span class="level-display">0 / 8</span>
+                        <button class="btn increment-btn">+</button>
+                    </div>
+                    <div>
+                        <input type="number" class="max-level-input" value="${this.totalParts}" min="1">
+                        <button class="btn reset-btn">Zerar</button>
+                    </div>
+                `;
+                potionsContainer.appendChild(this.potionCard);
+
+                this.levelDisplay = this.potionCard.querySelector('.level-display');
+                this.potionLiquid = this.potionCard.querySelector('.potion-liquid-rect');
+                this.maxLevelInput = this.potionCard.querySelector('.max-level-input');
+                this.incrementBtn = this.potionCard.querySelector('.increment-btn');
+                this.decrementBtn = this.potionCard.querySelector('.decrement-btn');
+                this.resetBtn = this.potionCard.querySelector('.reset-btn');
+                this.deleteBtn = this.potionCard.querySelector('.delete-btn');
+            }
+
+            updatePotionFill() {
+                const containerHeight = 150;
+                const containerY = 175;
+                const fillHeight = (this.currentLevel / this.totalParts) * containerHeight;
+                const yPosition = containerY - fillHeight;
+
+                this.potionLiquid.setAttribute('height', fillHeight);
+                this.potionLiquid.setAttribute('y', yPosition);
+                this.levelDisplay.textContent = `${this.currentLevel} / ${this.totalParts}`;
+                this.saveState();
+            }
+
+            saveState() {
+                const state = {
+                    level: this.currentLevel,
+                    max: this.totalParts
+                };
+                localStorage.setItem(`potion-${this.id}`, JSON.stringify(state));
+            }
+            
+            deletePotion() {
+                this.potionCard.remove();
+                localStorage.removeItem(`potion-${this.id}`);
+            }
+
+            loadState() {
+                const savedState = localStorage.getItem(`potion-${this.id}`);
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    this.currentLevel = state.level;
+                    this.totalParts = state.max;
+                    this.maxLevelInput.value = this.totalParts;
+                    this.updatePotionFill();
+                }
+            }
+
+            incrementLevel() {
+                if (this.currentLevel < this.totalParts) {
+                    this.currentLevel++;
+                    this.updatePotionFill();
+                }
+            }
+
+            decrementLevel() {
+                if (this.currentLevel > 0) {
+                    this.currentLevel--;
+                    this.updatePotionFill();
+                }
+            }
+
+            resetLevel() {
+                this.currentLevel = 0;
+                this.updatePotionFill();
+            }
+
+            updateMaxLevel() {
+                let newMax = parseInt(this.maxLevelInput.value, 10);
+                if (isNaN(newMax) || newMax < 1) {
+                    newMax = 1;
+                    this.maxLevelInput.value = 1;
+                }
+                this.totalParts = newMax;
+                if (this.currentLevel > this.totalParts) {
+                    this.currentLevel = this.totalParts;
+                }
+                this.updatePotionFill();
+            }
+
+            addEventListeners() {
+                this.incrementBtn.addEventListener('click', () => this.incrementLevel());
+                this.decrementBtn.addEventListener('click', () => this.decrementLevel());
+                this.resetBtn.addEventListener('click', () => this.resetLevel());
+                this.maxLevelInput.addEventListener('change', () => this.updateMaxLevel());
+                this.deleteBtn.addEventListener('click', () => this.deletePotion());
+            }
+        }
+
+        function createNewPotion(initialLevel, initialMax) {
+            const newPotion = new Potion(potionIdCounter++, initialLevel, initialMax);
+            localStorage.setItem('potionIdCounter', potionIdCounter);
+            return newPotion;
+        }
+
+        function loadPotions() {
+            const savedCounter = localStorage.getItem('potionIdCounter');
+            if (savedCounter) {
+                potionIdCounter = parseInt(savedCounter);
+            }
+
+            let foundPotions = false;
+            for (let i = 0; i < potionIdCounter; i++) {
+                const savedState = localStorage.getItem(`potion-${i}`);
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    new Potion(i, state.level, state.max);
+                    foundPotions = true;
+                }
+            }
+            // Se não houver poções salvas, cria uma poção padrão
+            if (!foundPotions) {
+                // Reinicia o contador para garantir que os IDs sejam corretos
+                potionIdCounter = 0;
+                localStorage.setItem('potionIdCounter', potionIdCounter);
+                createNewPotion(0, 8);
+            }
+        }
+
+        function exportPotions() {
+            const allPotions = {};
+            for (let i = 0; i < potionIdCounter; i++) {
+                const savedState = localStorage.getItem(`potion-${i}`);
+                if (savedState) {
+                    allPotions[`potion-${i}`] = JSON.parse(savedState);
+                }
+            }
+            
+            const data = {
+                potions: allPotions,
+                potionIdCounter: potionIdCounter
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pocoes-magicas-backup.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importPotions() {
+            fileInput.click();
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Limpa todas as poções atuais
+                    clearAllPotions(false);
+                    
+                    // Importa as poções do arquivo
+                    if (data.potions) {
+                        for (const [key, value] of Object.entries(data.potions)) {
+                            const id = key.split('-')[1];
+                            localStorage.setItem(key, JSON.stringify(value));
+                        }
+                    }
+                    
+                    // Atualiza o contador
+                    if (data.potionIdCounter) {
+                        potionIdCounter = data.potionIdCounter;
+                        localStorage.setItem('potionIdCounter', potionIdCounter);
+                    }
+                    
+                    // Recarrega as poções
+                    loadPotions();
+                    
+                    alert('Poções importadas com sucesso!');
+                } catch (error) {
+                    console.error('Erro ao importar poções:', error);
+                    alert('Erro ao importar poções. Verifique se o arquivo é válido.');
+                }
+            };
+            reader.readAsText(file);
+            // Limpa o input para permitir a importação do mesmo arquivo novamente
+            event.target.value = '';
+        }
+
+        function clearAllPotions(confirm = true) {
+            if (confirm && !window.confirm('Tem certeza que deseja limpar todas as poções? Esta ação não pode ser desfeita.')) {
+                return;
+            }
+            
+            // Remove todas as poções do DOM
+            while (potionsContainer.firstChild) {
+                potionsContainer.removeChild(potionsContainer.firstChild);
+            }
+            
+            // Limpa o localStorage
+            for (let i = 0; i < potionIdCounter; i++) {
+                localStorage.removeItem(`potion-${i}`);
+            }
+            localStorage.removeItem('potionIdCounter');
+            
+            // Reseta o contador
+            potionIdCounter = 0;
+            
+            // Cria uma nova poção padrão
+            createNewPotion(0, 8);
+        }
+
+        addPotionBtn.addEventListener('click', () => createNewPotion(0, 8));
+        exportBtn.addEventListener('click', exportPotions);
+        importBtn.addEventListener('click', importPotions);
+        clearAllBtn.addEventListener('click', () => clearAllPotions());
+        fileInput.addEventListener('change', handleFileImport);
+
+        // Carrega as poções salvas ao carregar a página
+        loadPotions();
+    </script>
+</body>
+</html>

@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_oza54roza54roza5.png">
+    <title>Jogo de Combate - Souls-like</title>
+    <style>
+        body {
+            font-family: 'Crimson Text', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #000000;
+            color: #d4a761;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #d4a761;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-container, .crud-container, .xp-total-container {
+            background-color: #333333;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid #555555;
+            max-width: 650px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .xp-total-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .level-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #d4a761;
+            margin-bottom: 10px;
+        }
+
+        .xp-display {
+            font-size: 2em;
+            font-weight: bold;
+            color: #d4a761;
+            text-shadow: 0 0 10px rgba(212, 167, 97, 0.7);
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 5px rgba(212, 167, 97, 0.5), 0 0 10px rgba(212, 167, 97, 0.5); }
+            to { text-shadow: 0 0 10px rgba(212, 167, 97, 0.7), 0 0 20px rgba(212, 167, 97, 0.7); }
+        }
+
+        .battle-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .enemy-section, .player-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .health-bar-container {
+            width: 280px;
+            height: 20px;
+            border: 2px solid #555555;
+            background-color: #444444;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        }
+
+        .health-bar {
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s ease-in-out;
+        }
+
+        .health-bar.red { background-color: #8B0000; }
+        .health-bar.green { background-color: #006400; }
+
+        .stats {
+            font-size: 0.9em;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .controls button, .crud-container button, .json-crud-container button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #555555;
+            color: #d4a761;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+            margin-top: 10px;
+        }
+
+        .controls button:hover, .crud-container button:hover, .json-crud-container button:hover {
+            background-color: #777777;
+        }
+
+        .potion-button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background-color: #555555;
+            color: #d4a761;
+            border: 2px solid #d4a761;
+            border-radius: 50px; 
+            transition: background-color 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+            margin-top: 10px;
+        }
+        
+        .potion-button:disabled {
+            filter: grayscale(100%);
+            cursor: not-allowed;
+        }
+
+        .json-crud-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .json-crud-container .import-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .json-crud-container > div {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #555555;
+        }
+        .json-crud-container h3 {
+            margin-bottom: 10px;
+        }
+
+        .json-crud-container select {
+            background-color: #555555;
+            color: #d4a761;
+            border: 1px solid #777777;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .battle-log-container {
+            margin-top: 30px;
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #555555;
+            background-color: #333333;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+        }
+
+        .battle-log-container h2 {
+            font-size: 1.3em;
+            margin-top: 0;
+            border-bottom: 1px solid #777777;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        #battle-log {
+            color: #d4a761;
+            padding: 10px;
+            height: 120px;
+            overflow-y: scroll;
+            background-color: #222222;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        #battle-log p {
+            margin: 5px 0;
+            padding-bottom: 3px;
+            border-bottom: 1px dashed #555555;
+        }
+
+        #battle-log p:last-child { border-bottom: none; }
+
+        .crud-container h3 {
+            font-size: 1.2em;
+            border-bottom: 1px solid #555555;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .crud-container form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .crud-container label {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 5px;
+        }
+
+        .crud-container input[type="text"],
+        .crud-container input[type="number"] {
+            background-color: #555555;
+            color: #d4a761;
+            border: 1px solid #777777;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .crud-container .form-buttons {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+
+        .defeated-enemies-container {
+            margin-top: 30px;
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #555555;
+            background-color: #333333;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+        }
+
+        .defeated-enemies-container h2 {
+            font-size: 1.3em;
+            margin-top: 0;
+            border-bottom: 1px solid #777777;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        #defeated-enemies-list {
+            color: #d4a761;
+            padding: 10px;
+            background-color: #222222;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .defeated-enemy-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #555555;
+            padding-bottom: 8px;
+        }
+
+        .defeated-enemy-item:last-child { border-bottom: none; }
+
+        .defeated-enemy-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid #777777;
+            margin-right: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        .defeated-enemy-item .enemy-info {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .defeated-enemy-item .enemy-name { font-weight: bold; }
+        
+        .section-container {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            background-color: #333333;
+            color: #d4a761;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: 1px solid #555555;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .section-header:hover {
+            background-color: #3a3a3a;
+        }
+        
+        .section-content {
+            background-color: #2a2a2a;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #555555;
+            border-top: none;
+            padding: 20px;
+            display: none;
+        }
+        
+        .section-content.active {
+            display: block;
+        }
+        
+        .toggle-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-icon.active {
+            transform: rotate(180deg);
+        }
+
+        .health-bar-description {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Prepare-se para a Batalha</h1>
+    
+    <div class="section-container">
+        <div class="section-header" onclick="toggleSection('prepare-section')">
+            <span>Prepare e Register</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div id="prepare-section" class="section-content">
+            <div class="game-container">
+                <div class="battle-area">
+                    <div class="enemy-section">
+                        <div class="health-bar-description">Desafiador</div>
+                        <div class="health-bar-container">
+                            <div id="enemy-health-bar" class="health-bar red"></div>
+                        </div>
+                        <div id="enemy-stats" class="stats">HP: <span id="enemy-hp-current">100</span>/<span id="enemy-hp-max">100</span></div>
+                        <div id="enemy-name" class="stats">???</div>
+                        <div id="enemy-attributes" class="stats"></div>
+                    </div>
+
+                    <div class="player-section">
+                        <div class="health-bar-description">Player</div>
+                        <div class="health-bar-container">
+                            <div id="player-health-bar" class="health-bar green"></div>
+                        </div>
+                        <div id="player-stats" class="stats">HP: <span id="player-hp-current">100</span>/<span id="player-hp-max">100</span></div>
+                        <div id="player-name" class="stats">Guerreiro</div>
+                        <div id="player-attributes" class="stats"></div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="attack-button">Atacar</button>
+                    <button id="potion-button" class="potion-button" title="Usar Poção">Potion</button>
+                </div>
+
+                <div class="battle-log-container">
+                    <h2>Registro da Batalha</h2>
+                    <div id="battle-log"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section-container">
+        <div class="section-header" onclick="toggleSection('progress-section')">
+            <span>Progresso e XP</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div id="progress-section" class="section-content">
+            <div class="xp-total-container">
+                <h2>Progresso</h2>
+                <div class="level-display">Nível <span id="player-level-display">1</span></div>
+                <span id="player-xp-display" class="xp-display">0 XP</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <div class="section-header" onclick="toggleSection('manage-section')">
+            <span>Gerenciar Jogador e Desafiante</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div id="manage-section" class="section-content">
+            <div class="crud-container">
+                <h3>Gerenciar Ficha do Jogador</h3>
+                <form id="player-crud-form">
+                    <label>Nome:<input type="text" id="player-name-input"></label>
+                    <label>HP Máx:<input type="number" id="player-max-hp-input"></label>
+                    <label>Ataque:<input type="number" id="player-attack-input"></label>
+                    <label>Defesa:<input type="number" id="player-defense-input"></label>
+                    <label>Poder (%):<input type="number" id="player-power-input"></label>
+                    <label>XP:<input type="number" id="player-xp-input"></label>
+                    <div class="form-buttons">
+                        <button type="submit" id="save-player-button">Salvar Ficha do Jogador</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="crud-container">
+                <h3>Gerenciar Ficha do Oponente</h3>
+                <form id="enemy-crud-form">
+                    <label>Nome:<input type="text" id="enemy-name-input"></label>
+                    <label>HP Máx:<input type="number" id="enemy-max-hp-input"></label>
+                    <label>Ataque:<input type="number" id="enemy-attack-input"></label>
+                    <label>Defesa:<input type="number" id="enemy-defense-input"></label>
+                    <label>Poder (%):<input type="number" id="enemy-power-input"></label>
+                    <div class="form-buttons">
+                        <button type="submit" id="save-enemy-button">Salvar Ficha do Oponente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <div class="section-header" onclick="toggleSection('backup-section')">
+            <span>Gerenciar Backup</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div id="backup-section" class="section-content">
+            <div class="crud-container json-crud-container">
+                <h2>Importar e Exportar Dados</h2>
+                <div class="import-section">
+                    <h3>Importar Ficha</h3>
+                    <p>Selecione um arquivo JSON e escolha para qual personagem importar.</p>
+                    <label>
+                        Importar para:
+                        <select id="import-target-select">
+                            <option value="player">Guerreiro</option>
+                            <option value="enemy">Desafiante</option>
+                        </select>
+                    </label>
+                    <input type="file" id="import-json-input" accept=".json">
+                    <button id="import-button">Importar Ficha</button>
+                </div>
+                <div>
+                    <h3>Exportar Fichas</h3>
+                    <p>Salve a ficha atual para usar depois ou compartilhar.</p>
+                    <button id="export-player-button">Exportar Ficha do Jogador</button>
+                    <button id="export-enemy-button">Exportar Ficha do Oponente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <div class="section-header" onclick="toggleSection('achievements-section')">
+            <span>Conquistas</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div id="achievements-section" class="section-content">
+            <div class="defeated-enemies-container">
+                <h2>Conquistas</h2>
+                <div id="defeated-enemies-list"></div>
+                <button id="clear-history-button">Limpar Histórico</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para alternar seções colapsáveis
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const icon = section.previousElementSibling.querySelector('.toggle-icon');
+            
+            section.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+        
+        // --- Elementos do DOM ---
+        const playerNameDisplay = document.getElementById('player-name');
+        const enemyNameDisplay = document.getElementById('enemy-name');
+        const playerAttributesDisplay = document.getElementById('player-attributes');
+        const enemyAttributesDisplay = document.getElementById('enemy-attributes');
+        const enemyHealthBar = document.getElementById('enemy-health-bar');
+        const playerHealthBar = document.getElementById('player-health-bar');
+        const enemyHpCurrentSpan = document.getElementById('enemy-hp-current');
+        const playerHpCurrentSpan = document.getElementById('player-hp-current');
+        const enemyHpMaxSpan = document.getElementById('enemy-hp-max');
+        const playerHpMaxSpan = document.getElementById('player-hp-max');
+        const attackButton = document.getElementById('attack-button');
+        const battleLog = document.getElementById('battle-log');
+        const defeatedEnemiesList = document.getElementById('defeated-enemies-list');
+        const playerLevelDisplay = document.getElementById('player-level-display');
+        const playerXpDisplay = document.getElementById('player-xp-display');
+
+        const potionButton = document.getElementById('potion-button');
+        const healAmount = 50;
+
+        // CRUD Player
+        const playerCrudForm = document.getElementById('player-crud-form');
+        const playerNameInput = document.getElementById('player-name-input');
+        const playerMaxHpInput = document.getElementById('player-max-hp-input');
+        const playerAttackInput = document.getElementById('player-attack-input');
+        const playerDefenseInput = document.getElementById('player-defense-input');
+        const playerPowerInput = document.getElementById('player-power-input');
+        const playerXpInput = document.getElementById('player-xp-input');
+
+        // CRUD Enemy
+        const enemyCrudForm = document.getElementById('enemy-crud-form');
+        const enemyNameInput = document.getElementById('enemy-name-input');
+        const enemyMaxHpInput = document.getElementById('enemy-max-hp-input');
+        const enemyAttackInput = document.getElementById('enemy-attack-input');
+        const enemyDefenseInput = document.getElementById('enemy-defense-input');
+        const enemyPowerInput = document.getElementById('enemy-power-input');
+        
+        // CRUD Histórico
+        const clearHistoryButton = document.getElementById('clear-history-button');
+
+        // JSON CRUD
+        const importJsonInput = document.getElementById('import-json-input');
+        const importButton = document.getElementById('import-button');
+        const importTargetSelect = document.getElementById('import-target-select');
+        const exportPlayerButton = document.getElementById('export-player-button');
+        const exportEnemyButton = document.getElementById('export-enemy-button');
+        
+        // --- Variáveis de estado do jogo ---
+        let defeatedEnemies = [];
+        let player, enemy;
+        
+        // --- Classes e Lógica do Jogo ---
+        class Character {
+            constructor(name, maxHp, attack, defense, power, xp = 0, level = 1) {
+                this.name = name;
+                this.maxHp = maxHp;
+                this.currentHp = maxHp;
+                this.attack = attack;
+                this.defense = defense;
+                this.power = power;
+                this.xp = xp;
+                this.level = level;
+            }
+
+            calculateDamage(target) {
+                let damage = this.attack - target.defense;
+                if (damage < 1) damage = 1;
+
+                if (Math.random() * 100 < this.power) {
+                    damage += Math.floor(Math.random() * 10 + 5);
+                    return { damage, isCritical: true };
+                }
+                return { damage, isCritical: false };
+            }
+
+            takeDamage(damage) {
+                this.currentHp -= damage;
+                if (this.currentHp < 0) {
+                    this.currentHp = 0;
+                }
+            }
+            
+            heal(amount) {
+                this.currentHp += amount;
+                if (this.currentHp > this.maxHp) {
+                    this.currentHp = this.maxHp;
+                }
+            }
+        }
+
+        // --- Funções do Jogo ---
+        function calculatePlayerLevel(xp) {
+            return Math.floor(Math.sqrt(xp / 100)) + 1;
+        }
+
+        function createNewEnemy(playerLevel) {
+            const enemyNames = ["Esqueleto", "Cavaleiro Negro", "Gárgola", "Zumbi Decrépito", "Lobo Sombrio", "Sentinela de Ferro"];
+            const randomName = enemyNames[Math.floor(Math.random() * enemyNames.length)];
+            
+            const basePoints = 20 + (playerLevel * 5);
+            let hpPoints = Math.floor(Math.random() * (basePoints / 3) + (basePoints / 2));
+            let attackPoints = Math.floor(Math.random() * (basePoints / 5) + (basePoints / 5));
+            let defensePoints = Math.floor(Math.random() * (basePoints / 5) + (basePoints / 5));
+            let powerPoints = basePoints - hpPoints - attackPoints - defensePoints;
+            if (powerPoints < 0) powerPoints = 0;
+
+            const maxHp = hpPoints * 10;
+            const attack = attackPoints * 2;
+            const defense = defensePoints;
+            const power = powerPoints * 3;
+            const xp = (maxHp + attack + defense + power) / 10;
+            
+            return new Character(randomName, maxHp, attack, defense, power, xp, 1);
+        }
+
+        function updateCharacterDisplay() {
+            playerNameDisplay.textContent = player.name;
+            enemyNameDisplay.textContent = enemy.name;
+            playerHpMaxSpan.textContent = player.maxHp;
+            enemyHpMaxSpan.textContent = enemy.maxHp;
+
+            playerAttributesDisplay.innerHTML = `Ataque: ${player.attack} | Defesa: ${player.defense} | Poder: ${player.power}%`;
+            enemyAttributesDisplay.innerHTML = `Ataque: ${enemy.attack} | Defesa: ${enemy.defense} | Poder: ${enemy.power}%`;
+        }
+
+        function updateCrudForms() {
+            playerNameInput.value = player.name;
+            playerMaxHpInput.value = player.maxHp;
+            playerAttackInput.value = player.attack;
+            playerDefenseInput.value = player.defense;
+            playerPowerInput.value = player.power;
+            playerXpInput.value = player.xp;
+
+            enemyNameInput.value = enemy.name;
+            enemyMaxHpInput.value = enemy.maxHp;
+            enemyAttackInput.value = enemy.attack;
+            enemyDefenseInput.value = enemy.defense;
+            enemyPowerInput.value = enemy.power;
+        }
+
+        function updateHealthBars() {
+            const playerHealthPercentage = (player.currentHp / player.maxHp) * 100;
+            const enemyHealthPercentage = (enemy.currentHp / enemy.maxHp) * 100;
+
+            playerHealthBar.style.width = `${playerHealthPercentage}%`;
+            enemyHealthBar.style.width = `${enemyHealthPercentage}%`;
+            
+            playerHpCurrentSpan.textContent = player.currentHp;
+            enemyHpCurrentSpan.textContent = enemy.currentHp;
+        }
+
+        function addLog(message) {
+            const p = document.createElement('p');
+            p.textContent = `(${new Date().toLocaleTimeString()}) ${message}`;
+            battleLog.appendChild(p);
+            battleLog.scrollTop = battleLog.scrollHeight;
+        }
+
+        function combatRound() {
+            if (player.currentHp <= 0 || enemy.currentHp <= 0) return;
+
+            const playerAttack = player.calculateDamage(enemy);
+            enemy.takeDamage(playerAttack.damage);
+            let playerLog = `Você atacou ${enemy.name} e causou ${playerAttack.damage} de dano.`;
+            if (playerAttack.isCritical) playerLog += ' (Acerto Crítico!)';
+            addLog(playerLog);
+
+            if (enemy.currentHp <= 0) {
+                const xpGained = Math.round(enemy.xp);
+                addLog(`${enemy.name} foi derrotado! Você ganhou ${xpGained} de XP.`);
+                
+                player.xp += xpGained;
+                player.level = calculatePlayerLevel(player.xp);
+
+                defeatedEnemies.push({ name: enemy.name, xp: xpGained });
+                localStorage.setItem('defeatedEnemies', JSON.stringify(defeatedEnemies));
+                
+                updatePlayerDataInLocalStorage();
+
+                enemy = createNewEnemy(player.level);
+                updateAllDisplays();
+                enemy.currentHp = enemy.maxHp;
+                updateHealthBars();
+                addLog(`Um novo desafiante, ${enemy.name}, surge!`);
+                return;
+            }
+
+            const enemyAttack = enemy.calculateDamage(player);
+            player.takeDamage(enemyAttack.damage);
+            let enemyLog = `${enemy.name} atacou você e causou ${enemyAttack.damage} de dano.`;
+            if (enemyAttack.isCritical) enemyLog += ' (Acerto Crítico!)';
+            addLog(enemyLog);
+
+            if (player.currentHp <= 0) {
+                addLog('Você foi derrotado... Que a escuridão te acolha.');
+                attackButton.disabled = true;
+                potionButton.disabled = true;
+            }
+
+            updateHealthBars();
+            updatePotionDisplay();
+        }
+
+        function updateDefeatedEnemiesList() {
+            defeatedEnemiesList.innerHTML = '';
+            if (defeatedEnemies.length === 0) {
+                defeatedEnemiesList.innerHTML = '<p>Nenhuma alma conquistada ainda.</p>';
+                return;
+            }
+            defeatedEnemies.forEach(enemy => {
+                const div = document.createElement('div');
+                div.classList.add('defeated-enemy-item');
+                const enemyInfoDiv = document.createElement('div');
+                enemyInfoDiv.classList.add('enemy-info');
+                const nameSpan = document.createElement('span');
+                nameSpan.classList.add('enemy-name');
+                nameSpan.textContent = enemy.name;
+                const xpSpan = document.createElement('span');
+                xpSpan.classList.add('enemy-xp');
+                xpSpan.textContent = `XP: ${enemy.xp}`;
+
+                enemyInfoDiv.appendChild(nameSpan);
+                enemyInfoDiv.appendChild(xpSpan);
+
+                div.appendChild(enemyInfoDiv);
+                defeatedEnemiesList.appendChild(div);
+            });
+        }
+        
+        function updatePlayerXpLevelDisplay() {
+            playerLevelDisplay.textContent = player.level;
+            playerXpDisplay.textContent = `${player.xp} XP`;
+        }
+
+        function updatePlayerDataInLocalStorage() {
+            localStorage.setItem('playerData', JSON.stringify({
+                name: player.name,
+                maxHp: player.maxHp,
+                currentHp: player.currentHp,
+                attack: player.attack,
+                defense: player.defense,
+                power: player.power,
+                xp: player.xp,
+                level: player.level,
+            }));
+        }
+
+        function updateAllDisplays() {
+            updateCharacterDisplay();
+            updateCrudForms();
+            updateHealthBars();
+            updateDefeatedEnemiesList();
+            updatePlayerXpLevelDisplay();
+            updatePotionDisplay();
+        }
+
+        function usePotion() {
+            if (player.currentHp > 0) {
+                const healBefore = player.currentHp;
+                player.heal(healAmount);
+                const healAfter = player.currentHp;
+                const actualHeal = healAfter - healBefore;
+                
+                addLog(`Você usou uma poção e recuperou ${actualHeal} de HP.`);
+                
+                updateHealthBars();
+                updatePotionDisplay();
+                updatePlayerDataInLocalStorage();
+            }
+        }
+
+        function updatePotionDisplay() {
+            potionButton.disabled = player.currentHp <= 0 || player.currentHp === player.maxHp;
+        }
+
+        // --- Eventos CRUD ---
+        playerCrudForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            player.name = playerNameInput.value;
+            player.maxHp = parseInt(playerMaxHpInput.value) || player.maxHp;
+            player.attack = parseInt(playerAttackInput.value) || player.attack;
+            player.defense = parseInt(playerDefenseInput.value) || player.defense;
+            player.power = parseInt(playerPowerInput.value) || player.power;
+            player.xp = parseInt(playerXpInput.value) || player.xp;
+
+            player.level = calculatePlayerLevel(player.xp);
+            player.currentHp = player.maxHp;
+
+            updatePlayerDataInLocalStorage();
+            updateAllDisplays();
+            addLog('Ficha do jogador atualizada.');
+        });
+        
+        enemyCrudForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            enemy.name = enemyNameInput.value;
+            enemy.maxHp = parseInt(enemyMaxHpInput.value) || enemy.maxHp;
+            enemy.attack = parseInt(enemyAttackInput.value) || enemy.attack;
+            enemy.defense = parseInt(enemyDefenseInput.value) || enemy.defense;
+            enemy.power = parseInt(enemyPowerInput.value) || enemy.power;
+
+            enemy.currentHp = enemy.maxHp;
+            updateAllDisplays();
+            addLog('Ficha do oponente atualizada.');
+        });
+        
+        importButton.addEventListener('click', () => {
+            const file = importJsonInput.files[0];
+            if (!file) {
+                alert('Por favor, selecione um arquivo JSON para importar.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const importedData = JSON.parse(event.target.result);
+                    const target = importTargetSelect.value;
+                    if (target === 'player') {
+                        player = new Character(
+                            importedData.name, 
+                            importedData.maxHp, 
+                            importedData.attack, 
+                            importedData.defense, 
+                            importedData.power,
+                            importedData.xp,
+                            importedData.level
+                        );
+                        player.currentHp = importedData.currentHp;
+                        updatePlayerDataInLocalStorage();
+                        addLog('Ficha do jogador importada com sucesso.');
+                    } else {
+                        enemy = new Character(
+                            importedData.name, 
+                            importedData.maxHp, 
+                            importedData.attack, 
+                            importedData.defense, 
+                            importedData.power
+                        );
+                        enemy.currentHp = importedData.currentHp;
+                        addLog('Ficha do oponente importada com sucesso.');
+                    }
+                    updateAllDisplays();
+                } catch (e) {
+                    alert('Erro ao processar o arquivo JSON. Certifique-se de que o formato está correto.');
+                }
+            };
+            reader.readAsText(file);
+        });
+        
+        function downloadFile(data, filename, type) {
+            const blob = new Blob([data], { type: type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        exportPlayerButton.addEventListener('click', () => {
+            const playerData = JSON.stringify(player, null, 2);
+            downloadFile(playerData, 'ficha_jogador.json', 'application/json');
+            addLog('Ficha do jogador exportada.');
+        });
+        
+        exportEnemyButton.addEventListener('click', () => {
+            const enemyData = JSON.stringify(enemy, null, 2);
+            downloadFile(enemyData, 'ficha_oponente.json', 'application/json');
+            addLog('Ficha do oponente exportada.');
+        });
+
+        clearHistoryButton.addEventListener('click', () => {
+            if (confirm('Tem certeza de que deseja limpar o histórico de inimigos derrotados?')) {
+                defeatedEnemies = [];
+                localStorage.removeItem('defeatedEnemies');
+                updateDefeatedEnemiesList();
+                addLog('Histórico de inimigos derrotados limpo.');
+            }
+        });
+        
+        // --- Eventos de Jogo ---
+        attackButton.addEventListener('click', combatRound);
+        potionButton.addEventListener('click', usePotion);
+
+        // --- Inicialização ---
+        function initializeGame() {
+            // Carregar dados salvos do Local Storage
+            const savedPlayer = JSON.parse(localStorage.getItem('playerData'));
+            const savedEnemies = JSON.parse(localStorage.getItem('defeatedEnemies'));
+            
+            if (savedPlayer) {
+                player = new Character(
+                    savedPlayer.name, 
+                    savedPlayer.maxHp, 
+                    savedPlayer.attack, 
+                    savedPlayer.defense, 
+                    savedPlayer.power,
+                    savedPlayer.xp,
+                    savedPlayer.level
+                );
+                player.currentHp = savedPlayer.currentHp;
+            } else {
+                player = new Character('Guerreiro', 100, 15, 5, 20);
+            }
+            
+            enemy = createNewEnemy(player.level);
+            
+            if (savedEnemies) {
+                defeatedEnemies = savedEnemies;
+            }
+            
+            updateAllDisplays();
+            addLog('Bem-vindo ao Campo de Batalha!');
+        }
+
+        initializeGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Linha do Tempo Visual com CRUD</title>
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_oza54roza54roza5.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cinzel', serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #d4a761;
+        }
+
+        h2, h3 {
+            margin-bottom: 10px;
+            color: #d4a761;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        #form {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input, button {
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            background-color: #333;
+            color: #d4a761;
+        }
+
+        input[type="file"] {
+            color: #d4a761;
+        }
+
+        button {
+            background-color: #555;
+            color: #d4a761;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #777;
+        }
+        
+        button[type="submit"] {
+            background-color: #d4a761;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #e0b471;
+        }
+
+        #timeline-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            border-top: 2px solid #d4a761;
+            padding-top: 60px;
+            position: relative;
+            height: 120px;
+            margin: 40px 0;
+        }
+
+        .branch {
+            display: inline-block;
+            position: absolute;
+        }
+
+        .branch-line {
+            stroke: #d4a761;
+            stroke-width: 2;
+        }
+
+        .main-line {
+            stroke: #d4a761;
+            stroke-width: 3;
+        }
+
+        .circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #d4a761;
+            position: absolute;
+            top: -40px;
+            left: -15px;
+            background: #d4a761;
+            box-shadow: 0 0 5px rgba(212, 167, 97, 0.7);
+        }
+
+        .circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #crud-section {
+            border-top: 1px solid #555;
+            padding-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #444;
+            text-align: left;
+            color: white;
+        }
+
+        th {
+            background-color: #333;
+            color: #d4a761;
+        }
+
+        td {
+            background-color: #2b2b2b;
+        }
+
+        img.thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            object-fit: cover;
+            border: 1px solid #d4a761;
+        }
+
+        .crud-btn {
+            background-color: #555;
+            color: #d4a761;
+            margin-right: 5px;
+            border: none;
+        }
+
+        .crud-btn.delete {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Estilos para os novos botões */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        #importBtn {
+            background-color: #777;
+            color: white;
+        }
+
+        #exportBtn {
+            background-color: #000;
+            color: #d4a761;
+        }
+
+        #clearBtn {
+            background-color: #d4a761;
+            color: #1a1a1a;
+        }
+
+        /* Estilos para as seções colapsáveis */
+        .collapsible-section {
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            background-color: #333;
+            color: #d4a761;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collapsible-header:hover {
+            background-color: #444;
+        }
+
+        .collapsible-header::after {
+            content: '+';
+            font-size: 18px;
+        }
+
+        .collapsible-header.active::after {
+            content: '-';
+        }
+
+        .collapsible-content {
+            padding: 0 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #2b2b2b;
+        }
+
+        /* Seção da timeline não colapsável */
+        #timeline-section {
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #2b2b2b;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Linha do Tempo Visual</h2>
+
+    <!-- Seção 1: Gerir Backup -->
+    <div class="collapsible-section">
+        <div class="collapsible-header">Gerir Backup</div>
+        <div class="collapsible-content">
+            <div class="action-buttons">
+                <button id="importBtn" class="action-btn">Importar JSON</button>
+                <button id="exportBtn" class="action-btn">Exportar JSON</button>
+                <button id="clearBtn" class="action-btn">Limpar Tudo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção 2: Adicionar Ponto -->
+    <div class="collapsible-section">
+        <div class="collapsible-header">Adicionar Ponto</div>
+        <div class="collapsible-content">
+            <form id="form">
+                <input type="text" id="text" placeholder="Texto (usado para evitar duplicatas)" required>
+                <input type="file" id="file" accept="image/*" required>
+                <button type="submit">Adicionar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Seção 3: Timeline (não colapsável) -->
+    <div id="timeline-section">
+        <h3>Timeline</h3>
+        <div id="timeline-container">
+            <svg id="timeline" height="100" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+    </div>
+
+    <!-- Seção 4: Gerenciador de Timeline -->
+    <div class="collapsible-section">
+        <div class="collapsible-header">Gerenciador de Timeline</div>
+        <div class="collapsible-content">
+            <div id="crud-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Texto</th>
+                            <th>Imagem</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="crud-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Adicionando funcionalidade para as seções colapsáveis
+        document.querySelectorAll('.collapsible-header').forEach(header => {
+            header.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        });
+
+        const form = document.getElementById('form');
+        const textInput = document.getElementById('text');
+        const fileInput = document.getElementById('file');
+        const timeline = document.getElementById('timeline');
+        const container = document.getElementById('timeline-container');
+        const crudTable = document.getElementById('crud-table-body');
+        const importBtn = document.getElementById('importBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        let items = JSON.parse(localStorage.getItem('timelineItems')) || [];
+
+        function renderTimeline() {
+            timeline.innerHTML = '';
+            container.querySelectorAll('.branch').forEach(el => el.remove());
+
+            const spacing = 120;
+            const startX = 60;
+            const lineY = 40;
+
+            if (items.length > 1) {
+                const mainLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                mainLine.setAttribute("x1", startX);
+                mainLine.setAttribute("y1", lineY);
+                mainLine.setAttribute("x2", startX + spacing * (items.length - 1));
+                mainLine.setAttribute("y2", lineY);
+                mainLine.setAttribute("class", "main-line");
+                timeline.appendChild(mainLine);
+            }
+
+            items.forEach((item, index) => {
+                const x = startX + index * spacing;
+
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x);
+                line.setAttribute("y1", 0);
+                line.setAttribute("x2", x);
+                line.setAttribute("y2", lineY);
+                line.setAttribute("class", "branch-line");
+                timeline.appendChild(line);
+
+                const branch = document.createElement("div");
+                branch.className = "branch";
+                branch.style.left = `${x}px`;
+
+                const circle = document.createElement("div");
+                circle.className = "circle";
+                const img = document.createElement("img");
+                img.src = item.url;
+                circle.appendChild(img);
+
+                branch.appendChild(circle);
+                container.appendChild(branch);
+            });
+
+            timeline.setAttribute("width", startX + spacing * items.length);
+        }
+
+        function renderCRUDTable() {
+            crudTable.innerHTML = '';
+            items.forEach((item, index) => {
+                const row = document.createElement('tr');
+
+                const textCell = document.createElement('td');
+                textCell.textContent = item.text;
+
+                const imgCell = document.createElement('td');
+                const img = document.createElement('img');
+                img.src = item.url;
+                img.className = 'thumb';
+                imgCell.appendChild(img);
+
+                const actionCell = document.createElement('td');
+
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Editar';
+                editBtn.className = 'crud-btn';
+                editBtn.onclick = () => handleEdit(index);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Excluir';
+                deleteBtn.className = 'crud-btn delete';
+                deleteBtn.onclick = () => handleDelete(index);
+
+                actionCell.appendChild(editBtn);
+                actionCell.appendChild(deleteBtn);
+
+                row.appendChild(textCell);
+                row.appendChild(imgCell);
+                row.appendChild(actionCell);
+
+                crudTable.appendChild(row);
+            });
+        }
+
+        function handleEdit(index) {
+            const newText = prompt("Novo texto:", items[index].text);
+            if (newText === null || newText.trim() === "") return;
+
+            const file = prompt("Deseja mudar a imagem? Clique em OK para escolher uma nova. Se não, clique em Cancelar.");
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = () => {
+                const newFile = input.files[0];
+                if (newFile) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        items[index] = { text: newText, url: event.target.result };
+                        saveAndRender();
+                    };
+                    reader.readAsDataURL(newFile);
+                }
+            };
+
+            if (file !== null) input.click();
+            else {
+                items[index].text = newText;
+                saveAndRender();
+            }
+        }
+
+        function handleDelete(index) {
+            if (confirm("Tem certeza que deseja excluir este item?")) {
+                items.splice(index, 1);
+                saveAndRender();
+            }
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('timelineItems', JSON.stringify(items));
+            renderTimeline();
+            renderCRUDTable();
+        }
+
+        function exportToJSON() {
+            const dataStr = JSON.stringify(items, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'linha-do-tempo.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function importFromJSON() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = event => {
+                    try {
+                        const importedItems = JSON.parse(event.target.result);
+                        if (Array.isArray(importedItems) && importedItems.length > 0) {
+                            if (confirm(`Deseja importar ${importedItems.length} itens? Isso substituirá os itens atuais.`)) {
+                                items = importedItems;
+                                saveAndRender();
+                                alert('Importação concluída com sucesso!');
+                            }
+                        } else {
+                            alert('O arquivo não contém dados válidos.');
+                        }
+                    } catch (error) {
+                        alert('Erro ao ler o arquivo JSON: ' + error.message);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function clearAll() {
+            if (confirm('Tem certeza que deseja limpar toda a linha do tempo? Esta ação não pode ser desfeita.')) {
+                items = [];
+                saveAndRender();
+                alert('Todos os itens foram removidos.');
+            }
+        }
+
+        // Event listeners
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newText = textInput.value.trim();
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Por favor, selecione uma imagem.");
+                return;
+            }
+
+            const exists = items.some(item => item.text === newText);
+            if (exists) {
+                alert("Item já existe com esse texto!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const newUrl = event.target.result;
+                const newItem = { text: newText, url: newUrl };
+                items.push(newItem);
+                saveAndRender();
+                textInput.value = '';
+                fileInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        importBtn.addEventListener('click', importFromJSON);
+        exportBtn.addEventListener('click', exportToJSON);
+        clearBtn.addEventListener('click', clearAll);
+
+        // Renderização inicial
+        renderTimeline();
+        renderCRUDTable();
+
+        // Abre a primeira seção por padrão
+        document.querySelector('.collapsible-header').click();
+    </script>
+
+</body>
+</html>

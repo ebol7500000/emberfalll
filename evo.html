@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evolução</title>
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_oza54roza54roza5.png" />
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --container-bg: #1a1a1a;
+            --border-color: #444;
+            --text-color: #e0e0e0;
+            --highlight-color: #d4a761;
+            --button-hover: #555;
+            --delete-bg: #f44336;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1518709766630-a7a2dbfd3aaf?q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--highlight-color);
+            text-shadow: 1px 1px 2px #000;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1::after {
+            content: "−";
+            font-size: 1.5em;
+        }
+
+        h1.collapsed::after {
+            content: "+";
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-top: 30px;
+        }
+
+        .image-display {
+            width: 100%;
+            height: 500px;
+            background-color: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .image-display img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: grayscale(80%) brightness(0.8);
+            transition: all 0.5s ease-in-out;
+        }
+
+        .image-display:hover img {
+            filter: none;
+            transform: scale(1.05);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--border-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+        
+        #addBtn, #updateBtn {
+            background-color: var(--highlight-color);
+            color: var(--bg-color);
+            font-weight: bold;
+        }
+        
+        #addBtn:hover, #updateBtn:hover {
+            background-color: #e0b471;
+            color: var(--bg-color);
+        }
+
+        #deleteBtn {
+            background-color: var(--delete-bg);
+            color: white;
+        }
+        
+        #deleteBtn:hover {
+            background-color: #d32f2f;
+        }
+        
+        #clearBtn {
+            background-color: var(--border-color);
+        }
+        #clearBtn:hover {
+            background-color: var(--button-hover);
+        }
+
+        .crud-panel {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .collapsed-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+
+        .expanded-content {
+            max-height: 5000px;
+            opacity: 1;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--highlight-color);
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #222;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: flex-end;
+        }
+
+        .image-list {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .image-list::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .image-list::-webkit-scrollbar-thumb {
+            background-color: var(--highlight-color);
+            border-radius: 4px;
+        }
+
+        .image-list::-webkit-scrollbar-track {
+            background-color: var(--container-bg);
+        }
+
+        .image-thumb {
+            min-width: 80px;
+            height: 80px;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .image-thumb:hover {
+            transform: translateY(-5px);
+            border-color: var(--highlight-color);
+        }
+
+        .image-thumb.active {
+            border-color: var(--highlight-color);
+            box-shadow: 0 0 8px var(--highlight-color);
+        }
+
+        .image-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.3s;
+        }
+
+        .image-thumb.active img {
+            filter: none;
+        }
+        
+        .io-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #importBtn {
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        #importBtn:hover {
+            background-color: #303f9f;
+        }
+
+        #exportBtn {
+            background-color: #009688;
+            color: white;
+        }
+        #exportBtn:hover {
+            background-color: #00796b;
+        }
+        
+        #jsonFile {
+            display: none;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            background-color: var(--container-bg);
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5em;
+            color: var(--highlight-color);
+        }
+
+        .section-header::after {
+            content: "−";
+            font-size: 1.5em;
+        }
+
+        .section-header.collapsed::after {
+            content: "+";
+        }
+
+        .section-content {
+            padding: 20px;
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            max-height: 5000px;
+            opacity: 1;
+        }
+
+        .section-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 20px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Galeria</h1>
+
+        <div class="image-display" id="imageDisplay">
+            <p id="noImages">Nenhuma imagem cadastrada</p>
+        </div>
+
+        <div class="navigation">
+            <button id="prevBtn">Anterior</button>
+            <span id="imageCounter">0/0</span>
+            <button id="nextBtn">Próxima</button>
+        </div>
+
+        <div class="section">
+            <div class="section-header" id="gerenciarHeader">Gerenciar Imagens</div>
+            <div class="section-content" id="gerenciarContent">
+                <div class="form-group">
+                    <label for="imageTitle">Título:</label>
+                    <input type="text" id="imageTitle" placeholder="Nome da imagem" />
+                </div>
+                <div class="form-group">
+                    <label for="imageFile">Selecionar Imagem:</label>
+                    <input type="file" id="imageFile" accept="image/*" multiple />
+                </div>
+                <div class="form-group">
+                    <label for="imageDesc">Descrição:</label>
+                    <textarea id="imageDesc" rows="3" placeholder="Descrição da imagem"></textarea>
+                </div>
+                <div class="actions">
+                    <button id="addBtn">Adicionar</button>
+                    <button id="updateBtn">Atualizar</button>
+                    <button id="deleteBtn">Remover</button>
+                    <button id="clearBtn">Limpar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" id="previewHeader">Pré-visualização</div>
+            <div class="section-content" id="previewContent">
+                <div class="image-list" id="imageList"></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header" id="ioHeader">Importar/Exportar</div>
+            <div class="section-content" id="ioContent">
+                <div class="io-actions">
+                    <button id="exportBtn">Exportar JSON</button>
+                    <button id="importBtn">Importar JSON</button>
+                    <input type="file" id="jsonFile" accept=".json" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageDisplay = document.getElementById('imageDisplay');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const imageCounter = document.getElementById('imageCounter');
+            const imageTitle = document.getElementById('imageTitle');
+            const imageFile = document.getElementById('imageFile');
+            const imageDesc = document.getElementById('imageDesc');
+            const addBtn = document.getElementById('addBtn');
+            const updateBtn = document.getElementById('updateBtn');
+            const deleteBtn = document.getElementById('deleteBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const imageList = document.getElementById('imageList');
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
+            const jsonFile = document.getElementById('jsonFile');
+
+            // Elementos das seções colapsáveis
+            const gerenciarHeader = document.getElementById('gerenciarHeader');
+            const gerenciarContent = document.getElementById('gerenciarContent');
+            const previewHeader = document.getElementById('previewHeader');
+            const previewContent = document.getElementById('previewContent');
+            const ioHeader = document.getElementById('ioHeader');
+            const ioContent = document.getElementById('ioContent');
+
+            let images = [];
+            let currentIndex = -1;
+
+            // Variáveis e funções para o IndexedDB
+            let db;
+            const DB_NAME = 'galeriaDB';
+            const STORE_NAME = 'images';
+            const DB_VERSION = 1;
+
+            // Função para abrir o banco de dados
+            function openDatabase() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                    request.onupgradeneeded = (event) => {
+                        db = event.target.result;
+                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                            db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                        }
+                    };
+
+                    request.onsuccess = (event) => {
+                        db = event.target.result;
+                        console.log('Banco de dados aberto com sucesso.');
+                        resolve();
+                    };
+
+                    request.onerror = (event) => {
+                        console.error('Erro ao abrir o banco de dados:', event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+            }
+
+            // Função para carregar todas as imagens do IndexedDB
+            function loadImagesFromDB() {
+                return new Promise((resolve) => {
+                    if (!db) {
+                        resolve([]);
+                        return;
+                    }
+
+                    const transaction = db.transaction([STORE_NAME], 'readonly');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.getAll();
+
+                    request.onsuccess = (event) => {
+                        images = event.target.result;
+                        console.log('Imagens carregadas do IndexedDB:', images);
+                        resolve(images);
+                    };
+
+                    request.onerror = (event) => {
+                        console.error('Erro ao carregar imagens do IndexedDB:', event.target.error);
+                        resolve([]);
+                    };
+                });
+            }
+
+            // Função para adicionar uma nova imagem ao IndexedDB
+            function addImageToDB(newImage) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.add(newImage);
+
+                    request.onsuccess = () => {
+                        console.log('Imagem adicionada com sucesso.');
+                        resolve();
+                    };
+
+                    request.onerror = (event) => {
+                        console.error('Erro ao adicionar imagem:', event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+            }
+            
+            // Função para atualizar uma imagem no IndexedDB
+            function updateImageInDB(updatedImage) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.put(updatedImage);
+
+                    request.onsuccess = () => {
+                        console.log('Imagem atualizada com sucesso.');
+                        resolve();
+                    };
+
+                    request.onerror = (event) => {
+                        console.error('Erro ao atualizar imagem:', event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+            }
+
+            // Função para remover uma imagem do IndexedDB
+            function deleteImageFromDB(id) {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    const request = store.delete(id);
+
+                    request.onsuccess = () => {
+                        console.log('Imagem removida com sucesso.');
+                        resolve();
+                    };
+
+                    request.onerror = (event) => {
+                        console.error('Erro ao remover imagem:', event.target.error);
+                        reject(event.target.error);
+                    };
+                });
+            }
+
+            // Função para alternar seções colapsáveis (mantém a sua lógica)
+            function toggleSection(header, content) {
+                header.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+            }
+
+            // Adiciona eventos de clique aos cabeçalhos das seções
+            gerenciarHeader.addEventListener('click', () => toggleSection(gerenciarHeader, gerenciarContent));
+            previewHeader.addEventListener('click', () => toggleSection(previewHeader, previewContent));
+            ioHeader.addEventListener('click', () => toggleSection(ioHeader, ioContent));
+
+            // Funções de manipulação do DOM
+            function updateImageDisplay() {
+                imageDisplay.innerHTML = '';
+                if (images.length === 0) {
+                    const msg = document.createElement('p');
+                    msg.id = 'noImages';
+                    msg.textContent = 'Nenhuma imagem cadastrada';
+                    imageDisplay.appendChild(msg);
+                    clearForm();
+                    return;
+                }
+
+                const currentImage = images[currentIndex];
+                const img = document.createElement('img');
+                img.src = currentImage.url;
+                img.alt = currentImage.title;
+                imageDisplay.appendChild(img);
+
+                imageTitle.value = currentImage.title || '';
+                imageDesc.value = currentImage.description || '';
+                imageFile.value = null;
+
+                const items = imageList.querySelectorAll('.image-thumb');
+                items.forEach((item, index) => {
+                    item.classList.toggle('active', index === currentIndex);
+                });
+            }
+
+            function updateCounter() {
+                imageCounter.textContent = images.length === 0 ? '0/0' : `${currentIndex + 1}/${images.length}`;
+            }
+
+            function renderImageList() {
+                imageList.innerHTML = '';
+                if (images.length === 0) {
+                    imageList.innerHTML = '<p>Nenhuma imagem cadastrada</p>';
+                    return;
+                }
+
+                images.forEach((image, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'image-thumb';
+                    if (index === currentIndex) item.classList.add('active');
+
+                    const img = document.createElement('img');
+                    img.src = image.url;
+                    img.alt = image.title;
+                    item.appendChild(img);
+
+                    item.addEventListener('click', () => {
+                        currentIndex = index;
+                        updateImageDisplay();
+                        updateCounter();
+                    });
+
+                    imageList.appendChild(item);
+                });
+            }
+
+            // Listeners de navegação
+            prevBtn.addEventListener('click', () => {
+                if (images.length === 0) return;
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+                updateImageDisplay();
+                updateCounter();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (images.length === 0) return;
+                currentIndex = (currentIndex + 1) % images.length;
+                updateImageDisplay();
+                updateCounter();
+            });
+
+            // Adicionado um listener para o evento 'change' do input de arquivo
+            imageFile.addEventListener('change', () => {
+                const files = imageFile.files;
+                if (files.length === 0) return;
+
+                imageTitle.value = '';
+                imageDesc.value = '';
+
+                updateBtn.disabled = files.length > 1;
+            });
+
+            // Adicionar imagem
+            addBtn.addEventListener('click', async () => {
+                const files = imageFile.files;
+                if (files.length === 0) {
+                    alert('Por favor, selecione uma ou mais imagens para adicionar!');
+                    return;
+                }
+
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const newImage = {
+                            title: file.name,
+                            url: e.target.result,
+                            description: ''
+                        };
+                        await addImageToDB(newImage);
+                        await init();
+                        alert(`Imagem "${file.name}" adicionada com sucesso!`);
+                    };
+                    reader.readAsDataURL(file);
+                }
+                clearForm();
+            });
+
+            // Atualizar imagem
+            updateBtn.addEventListener('click', async () => {
+                if (currentIndex === -1) {
+                    alert('Nenhuma imagem selecionada para atualizar!');
+                    return;
+                }
+
+                const title = imageTitle.value.trim();
+                const description = imageDesc.value.trim();
+                const file = imageFile.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const updatedImage = {
+                            ...images[currentIndex],
+                            title: title || file.name || 'Sem título',
+                            url: e.target.result,
+                            description: description
+                        };
+                        await updateImageInDB(updatedImage);
+                        await init();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    const updatedImage = {
+                        ...images[currentIndex],
+                        title: title || 'Sem título',
+                        description: description
+                    };
+                    await updateImageInDB(updatedImage);
+                    await init();
+                }
+                clearForm();
+            });
+
+            // Remover imagem
+            deleteBtn.addEventListener('click', async () => {
+                if (currentIndex === -1) {
+                    alert('Nenhuma imagem selecionada para remover!');
+                    return;
+                }
+
+                if (confirm('Tem certeza que deseja remover esta imagem?')) {
+                    const idToRemove = images[currentIndex].id;
+                    await deleteImageFromDB(idToRemove);
+
+                    if (images.length > 1) {
+                        currentIndex = Math.max(0, currentIndex - 1);
+                    } else {
+                        currentIndex = -1;
+                    }
+                    
+                    await init();
+                    clearForm();
+                    alert('Imagem removida com sucesso!');
+                }
+            });
+
+            // Limpar formulário
+            clearBtn.addEventListener('click', clearForm);
+
+            function clearForm() {
+                imageTitle.value = '';
+                imageFile.value = null;
+                imageDesc.value = '';
+            }
+
+            // Funções de Exportar e Importar JSON
+            exportBtn.addEventListener('click', () => {
+                if (images.length === 0) {
+                    alert('Não há imagens para exportar.');
+                    return;
+                }
+                
+                const dataToExport = images.map(img => ({
+                    title: img.title,
+                    url: img.url,
+                    description: img.description
+                }));
+                const jsonStr = JSON.stringify(dataToExport, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'galeria_imagens.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                alert('Dados exportados com sucesso!');
+            });
+            
+            importBtn.addEventListener('click', () => {
+                jsonFile.click();
+            });
+            
+            jsonFile.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) {
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const importedImages = JSON.parse(e.target.result);
+                        if (Array.isArray(importedImages) && importedImages.every(img => img.url)) {
+                            // Limpa o banco de dados existente antes de importar
+                            const transaction = db.transaction([STORE_NAME], 'readwrite');
+                            const store = transaction.objectStore(STORE_NAME);
+                            await new Promise((resolve) => {
+                                const clearRequest = store.clear();
+                                clearRequest.onsuccess = resolve;
+                            });
+                            
+                            // Adiciona as novas imagens
+                            for (const img of importedImages) {
+                                await addImageToDB(img);
+                            }
+                            
+                            await init();
+                            alert('Dados importados com sucesso!');
+                        } else {
+                            alert('O arquivo JSON não está no formato correto.');
+                        }
+                    } catch (error) {
+                        alert('Erro ao ler o arquivo JSON. Verifique se é um arquivo JSON válido.');
+                    }
+                    jsonFile.value = null;
+                };
+                reader.readAsText(file);
+            });
+
+            // Função de inicialização
+            async function init() {
+                await openDatabase();
+                images = await loadImagesFromDB();
+                if (images.length > 0) {
+                    currentIndex = 0;
+                } else {
+                    currentIndex = -1;
+                }
+                renderImageList();
+                updateImageDisplay();
+                updateCounter();
+            }
+
+            // Inicia a aplicação
+            init();
+        });
+    </script>
+</body>
+</html>
