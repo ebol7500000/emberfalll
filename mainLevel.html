@@ -27,6 +27,14 @@
             color: var(--font-color);
             text-align: center;
             padding-bottom: 20px;
+            margin: 0; /* Garante que não há margem padrão no body */
+        }
+
+        .main-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto; /* Centraliza o container principal */
+            text-align: left; /* Alinha o texto dentro do container à esquerda */
         }
 
         h1 {
@@ -35,21 +43,20 @@
             text-shadow: 0 0 10px rgba(212, 167, 97, 0.4);
             padding: 20px 0;
             border-bottom: 2px solid var(--highlight-color);
-            display: inline-block;
-            margin-top: 20px;
+            display: block; /* Ocupa a largura total */
+            margin: 20px 0; /* Ajusta margens superior e inferior */
+            text-align: center; /* Centraliza o texto do H1 */
         }
 
         .scroll {
             background-color: var(--main-color);
             border: 2px solid #2e2e2e;
             border-radius: 12px;
-            width: 90%;
-            max-width: 800px;
             height: 400px;
-            margin: 20px auto;
             padding: 20px;
             overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+            /* Removidas width e margin aqui, pois o .content já cuida disso */
         }
         
         .scroll::-webkit-scrollbar {
@@ -114,17 +121,25 @@
         .crud {
             margin-top: 20px;
             display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
+            flex-direction: column; /* Para empilhar os inputs */
+            align-items: stretch; /* Estica os itens para preencher a largura */
             gap: 10px;
+            background-color: var(--main-color);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #444;
         }
         
+        .crud h3 {
+            text-align: center; /* Centraliza o título "Adicionar Item" */
+        }
+
         /* Contêiner para os botões de backup */
         .backup-buttons {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-top: 20px;
+            padding: 20px 0; /* Adicionado padding para manter espaçamento interno */
         }
 
         input, button, select {
@@ -135,6 +150,8 @@
             color: var(--font-color);
             font-family: inherit;
             transition: background-color 0.3s, border-color 0.3s;
+            width: 100%; /* Faz inputs e selects ocuparem a largura total do crud */
+            box-sizing: border-box; /* Inclui padding e border na largura total */
         }
         
         input:focus, select:focus {
@@ -147,6 +164,8 @@
             background-color: var(--button-color);
             border: none;
             cursor: pointer;
+            width: auto; /* Botões no CRUD podem ter largura automática */
+            align-self: flex-end; /* Alinha o botão "Adicionar" à direita */
         }
         
         .crud button:hover {
@@ -160,6 +179,7 @@
             border: none;
             cursor: pointer;
             transition: background-color 0.3s;
+            width: auto; /* Botões de backup podem ter largura automática */
         }
 
         .backup-buttons button:hover {
@@ -174,6 +194,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.2s ease;
+            width: auto; /* Para não esticar o botão interno do file input */
         }
         
         input[type="file"]::file-selector-button:hover {
@@ -182,9 +203,7 @@
 
         /* Barra de XP */
         .xp-container {
-            width: 90%;
-            max-width: 800px;
-            margin: 20px auto;
+            margin: 20px 0; /* Ajustada para 0 nas laterais */
             background-color: var(--main-color);
             border: 1px solid #444;
             border-radius: 10px;
@@ -217,6 +236,7 @@
             font-weight: bold;
             margin: 10px 0;
             color: var(--highlight-color);
+            text-align: center; /* Centraliza o texto do nível */
         }
 
         /* Controle de XP/Level */
@@ -224,9 +244,23 @@
             background: rgba(0,0,0,0.2);
             padding: 15px;
             border-radius: 10px;
-            display: inline-block;
+            display: flex; /* Usar flexbox para alinhar itens */
+            flex-wrap: wrap; /* Permite que os itens quebrem linha */
+            justify-content: center; /* Centraliza os itens */
+            gap: 10px;
             margin-top: 20px;
             border: 1px solid #444;
+            width: fit-content; /* Ajusta a largura ao conteúdo */
+            margin-left: auto; /* Centraliza o bloco de controle de XP/Level */
+            margin-right: auto; /* Centraliza o bloco de controle de XP/Level */
+        }
+        .xp-control label {
+            white-space: nowrap; /* Impede que a label quebre linha */
+            display: flex;
+            align-items: center;
+        }
+        .xp-control input, .xp-control select, .xp-control button {
+            width: auto; /* Ajusta a largura dos elementos no controle de XP */
         }
 
         /* Animação de ganho de XP */
@@ -253,18 +287,18 @@
             color: var(--font-color);
             cursor: pointer;
             padding: 18px;
-            width: 90%;
-            max-width: 800px;
+            width: 100%; /* Ocupa 100% do .main-container */
             border: none;
             text-align: left;
             outline: none;
             font-size: 18px;
             font-weight: bold;
-            margin: 10px auto 0;
+            margin: 10px 0 0; /* Margem superior, sem laterais */
             border-radius: 10px 10px 0 0;
             border: 1px solid #444;
             border-bottom: none;
             position: relative;
+            box-sizing: border-box; /* Garante que padding e border não aumentem a largura */
         }
 
         .collapsible:after {
@@ -282,10 +316,9 @@
         }
 
         .content {
-            width: 90%;
-            max-width: 800px;
-            margin: 0 auto 20px;
-            padding: 0 18px;
+            width: 100%; /* Ocupa 100% do .main-container */
+            margin: 0 0 20px; /* Margem inferior, sem laterais */
+            padding: 0 18px; /* Padding interno */
             background-color: var(--main-color);
             max-height: 0;
             overflow: hidden;
@@ -293,6 +326,7 @@
             border-radius: 0 0 10px 10px;
             border: 1px solid #444;
             border-top: none;
+            box-sizing: border-box; /* Garante que padding e border não aumentem a largura */
         }
 
         .section-container {
@@ -302,60 +336,56 @@
 </head>
 <body>
 
-    <h1>📜 Lista de Itens </h1>
+    <div class="main-container">
+        <h1>📜 Lista de Itens </h1>
 
-    <div class="section-container">
-        <!-- Menu 1: Nível -->
-        <button type="button" class="collapsible">Nível (0 - MAX)</button>
-        <div class="content">
-            <div class="level-display">Nível: <span id="playerLevel">1</span></div>
-            <div class="xp-container">
-                <div class="xp-bar" id="xpBar"></div>
-                <div class="xp-text" id="xpText">0 / 300 XP</div>
+        <div class="section-container">
+            <button type="button" class="collapsible">Nível (0 - MAX)</button>
+            <div class="content">
+                <div class="level-display">Nível: <span id="playerLevel">1</span></div>
+                <div class="xp-container">
+                    <div class="xp-bar" id="xpBar"></div>
+                    <div class="xp-text" id="xpText">0 / 300 XP</div>
+                </div>
+
+                <div class="xp-control">
+                    <label>XP:</label>
+                    <input type="number" id="xpInput" min="0" value="0">
+                    <label>Level:</label>
+                    <select id="levelInput"></select>
+                    <button onclick="applyManualChanges()">Aplicar</button>
+                </div>
             </div>
 
-            <div class="xp-control">
-                <label>XP:</label>
-                <input type="number" id="xpInput" min="0" value="0">
-                <label>Level:</label>
-                <select id="levelInput"></select>
-                <button onclick="applyManualChanges()">Aplicar</button>
+            <button type="button" class="collapsible">Modifier de Grinding</button>
+            <div class="content">
+                <div style="padding: 20px;">
+                    <p>Configurações de grinding serão adicionadas aqui.</p>
+                </div>
+            </div>
+
+            <button type="button" class="collapsible">Lista de Itens</button>
+            <div class="content">
+                <div class="scroll" id="itemList"></div>
+            </div>
+
+            <button type="button" class="collapsible">Gerenciar (JSON import e export)</button>
+            <div class="content">
+                <div class="backup-buttons">
+                    <button onclick="exportBackup()">Exportar Backup 💾</button>
+                    <button onclick="document.getElementById('importInput').click()">Importar Backup 📂</button>
+                    <input type="file" id="importInput" accept=".json" style="display: none;">
+                </div>
             </div>
         </div>
 
-        <!-- Menu 2: Modifier de Grinding -->
-        <button type="button" class="collapsible">Modifier de Grinding</button>
-        <div class="content">
-            <div style="padding: 20px;">
-                <p>Configurações de grinding serão adicionadas aqui.</p>
-                <!-- Adicione aqui os controles para modificar o grinding -->
-            </div>
+        <div class="crud">
+            <h3 style="margin-top: 0; color: var(--highlight-color);">Adicionar Item</h3>
+            <input type="text" id="itemName" placeholder="Nome do Item">
+            <input type="number" id="itemValue" placeholder="Valor">
+            <input type="file" id="itemImageInput" accept="image/*">
+            <button onclick="addItem()">Adicionar</button>
         </div>
-
-        <!-- Menu 3: Lista de Itens -->
-        <button type="button" class="collapsible">Lista de Itens</button>
-        <div class="content">
-            <div class="scroll" id="itemList"></div>
-        </div>
-
-        <!-- Menu 4: Gerenciar (JSON import/export) -->
-        <button type="button" class="collapsible">Gerenciar (JSON import e export)</button>
-        <div class="content">
-            <div class="backup-buttons" style="padding: 20px;">
-                <button onclick="exportBackup()">Exportar Backup 💾</button>
-                <button onclick="document.getElementById('importInput').click()">Importar Backup 📂</button>
-                <input type="file" id="importInput" accept=".json" style="display: none;">
-            </div>
-        </div>
-    </div>
-
-    <!-- Menu Adicionar Item (fixo na parte inferior) -->
-    <div class="crud" style="width: 90%; max-width: 800px; margin: 20px auto; background-color: var(--main-color); padding: 20px; border-radius: 10px; border: 1px solid #444;">
-        <h3 style="margin-top: 0; color: var(--highlight-color);">Adicionar Item</h3>
-        <input type="text" id="itemName" placeholder="Nome do Item">
-        <input type="number" id="itemValue" placeholder="Valor">
-        <input type="file" id="itemImageInput" accept="image/*">
-        <button onclick="addItem()">Adicionar</button>
     </div>
 
     <script>
@@ -477,7 +507,7 @@
                 document.getElementById('playerLevel').innerText = `${MAX_LEVEL} (Paragon ${paragonLevel})`;
                 
             } else {
-                    document.getElementById('playerLevel').innerText = playerLevel;
+                document.getElementById('playerLevel').innerText = playerLevel;
             }
 
             const percent = (currentXP / xpToNext) * 100;
@@ -605,13 +635,22 @@
                 if (content.style.maxHeight){
                     content.style.maxHeight = null;
                 } else {
-                    content.style.maxHeight = content.scrollHeight + "px";
-                } 
+                    // Adiciona um pequeno atraso para o cálculo do scrollHeight ser preciso
+                    setTimeout(() => {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }, 0);
+                }
             });
         }
 
         // Abre o primeiro menu por padrão
-        document.getElementsByClassName("collapsible")[0].click();
+        // Atraso para garantir que o DOM esteja totalmente renderizado e scrollHeight correto
+        setTimeout(() => {
+            if (coll.length > 0) {
+                coll[0].click();
+            }
+        }, 100);
+
 
         renderItems();
         updateXPBar();

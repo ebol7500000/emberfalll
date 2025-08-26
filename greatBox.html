@@ -1,577 +1,513 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/png" href="Gemini_Generated_Image_oza54roza54roza5.png" />
-  <title>Bau reserva</title>
-  <style>
-    body {
-      background-color: #121212;
-      color: #ffffff;
-      font-family: sans-serif;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    .container {
-      display: flex;
-      flex-grow: 1;
-      justify-content: center;
-      padding: 20px;
-      gap: 20px;
-      flex-direction: column;
-    }
-    .column {
-      flex: 1;
-      background-color: #1e1e1e;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      cursor: pointer;
-    }
-    .rectangle {
-      width: 80%;
-      max-width: 400px;
-      height: 60px;
-      background-color: #d4a761;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 24px;
-      font-weight: bold;
-      border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(255,0,0,0.5);
-    }
-    .footer {
-      display: none; /* Ocultado pois não há mais level/xp para exibir */
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 20;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background-color: #2c2c2c;
-      padding: 20px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 90vh;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #444;
-    }
-    .modal-body {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding-right: 10px;
-    }
-    .close-button {
-      color: #aaa;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close-button:hover {
-      color: #fff;
-    }
-    #crud-form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    #crud-form input[type="file"]::file-selector-button {
-      background-color: #6200ee;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #crud-form input[type="file"]::file-selector-button:hover {
-      background-color: #7b29ff;
-    }
-    #crud-form button {
-      padding: 12px;
-      border: none;
-      border-radius: 4px;
-      background-color: #6200ee;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #crud-form button:hover {
-      background-color: #7b29ff;
-    }
-    #crud-form h3 {
-      margin-top: 25px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #444;
-      padding-bottom: 5px;
-    }
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(5, 1fr);
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      gap: 5px;
-      margin-top: 20px;
-    }
-    .grid-item {
-      background-color: #333;
-      border-radius: 4px;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      cursor: pointer;
-    }
-    .grid-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    /* Estilos para os novos botões */
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-      justify-content: center;
-    }
-    .action-buttons button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-      color: #121212;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
-    .action-buttons #export-button {
-      background-color: #d4a761;
-      color: #121212;
-    }
-    .action-buttons #export-button:hover {
-      background-color: #b88d55;
-    }
-    .action-buttons #import-button {
-      background-color: #333;
-      color: #ffffff;
-    }
-    .action-buttons #import-button:hover {
-      background-color: #444;
-    }
-    .action-buttons #clear-button {
-        background-color: #121212;
-        color: #ffffff;
-    }
-    .action-buttons #clear-button:hover {
-        background-color: #222;
-    }
-    #import-file-input {
-      display: none;
-    }
-    
-    /* Estilos para os menus collapsible */
-    .collapsible {
-      background-color: #333;
-      color: white;
-      cursor: pointer;
-      padding: 18px;
-      width: 100%;
-      border: none;
-      text-align: left;
-      outline: none;
-      font-size: 18px;
-      margin-bottom: 5px;
-      border-radius: 5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .collapsible:after {
-      content: '\002B';
-      font-weight: bold;
-      float: right;
-      margin-left: 5px;
-    }
-    
-    .active:after {
-      content: "\2212";
-    }
-    
-    .content {
-      padding: 0 18px;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.2s ease-out;
-      background-color: #1e1e1e;
-      border-radius: 0 0 5px 5px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    
-    .menu-container {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    
-    .menu-section {
-      margin-bottom: 20px;
-    }
-    
-    /* Estilo para o grid de fotos */
-    .photos-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      padding: 10px 0;
-    }
-    
-    .photo-item {
-      width: 100%;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 5px;
-    }
-    
-    /* Estilo para o backup manager */
-    .backup-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 10px 0;
-    }
-    
-    .backup-buttons button {
-      padding: 10px 15px;
-      background-color: #6200ee;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    
-    .backup-buttons button:hover {
-      background-color: #7b29ff;
-    }
-  </style>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <link rel="icon" type="image/png" href="Gemini_Generated_Image_oza54roza54roza5.png" />
+   <title>Bau reserva</title>
+   <style>
+      body {
+         background-color: #121212;
+         color: #ffffff;
+         font-family: sans-serif;
+         margin: 0;
+         display: flex;
+         flex-direction: column;
+         min-height: 100vh;
+      }
+      .container {
+         display: flex;
+         flex-grow: 1;
+         justify-content: center;
+         padding: 20px;
+         gap: 20px;
+         flex-direction: column;
+      }
+      .column {
+         flex: 1;
+         background-color: #1e1e1e;
+         border-radius: 8px;
+         padding: 20px;
+         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+      }
+      .header {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         padding: 20px;
+         cursor: pointer;
+      }
+      .rectangle {
+         width: 80%;
+         max-width: 400px;
+         height: 60px;
+         background-color: #d4a761;
+         color: white;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         font-size: 24px;
+         font-weight: bold;
+         border-radius: 8px;
+         box-shadow: 0 4px 15px rgba(255,0,0,0.5);
+      }
+      .footer {
+         display: none; /* Ocultado pois não há mais level/xp para exibir */
+      }
+      .modal {
+         display: none;
+         position: fixed;
+         z-index: 20;
+         left: 0;
+         top: 0;
+         width: 100%;
+         height: 100%;
+         background-color: rgba(0,0,0,0.7);
+         justify-content: center;
+         align-items: center;
+      }
+      .modal-content {
+         background-color: #2c2c2c;
+         padding: 20px;
+         border-radius: 8px;
+         width: 90%;
+         max-width: 500px;
+         max-height: 90vh;
+         box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+         position: relative;
+         display: flex;
+         flex-direction: column;
+      }
+      .modal-header {
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         margin-bottom: 15px;
+         padding-bottom: 10px;
+         border-bottom: 1px solid #444;
+      }
+      .modal-body {
+         flex-grow: 1;
+         overflow-y: auto;
+         padding-right: 10px;
+      }
+      .close-button {
+         color: #aaa;
+         font-size: 28px;
+         font-weight: bold;
+         cursor: pointer;
+      }
+      .close-button:hover {
+         color: #fff;
+      }
+      #crud-form {
+         display: flex;
+         flex-direction: column;
+         gap: 15px;
+      }
+      #crud-form input[type="file"]::file-selector-button {
+         background-color: #6200ee;
+         color: white;
+         border: none;
+         padding: 8px 12px;
+         border-radius: 4px;
+         cursor: pointer;
+      }
+      #crud-form input[type="file"]::file-selector-button:hover {
+         background-color: #7b29ff;
+      }
+      #crud-form button {
+         padding: 12px;
+         border: none;
+         border-radius: 4px;
+         background-color: #6200ee;
+         color: white;
+         font-size: 16px;
+         cursor: pointer;
+      }
+      #crud-form button:hover {
+         background-color: #7b29ff;
+      }
+      #crud-form h3 {
+         margin-top: 25px;
+         margin-bottom: 10px;
+         border-bottom: 1px solid #444;
+         padding-bottom: 5px;
+      }
+      .grid-container {
+         display: grid;
+         grid-template-columns: repeat(5, 1fr);
+         grid-template-rows: repeat(5, 1fr);
+         width: 100%;
+         aspect-ratio: 1 / 1;
+         gap: 5px;
+         margin-top: 20px;
+      }
+      .grid-item {
+         background-color: #333;
+         border-radius: 4px;
+         overflow: hidden;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         position: relative;
+         cursor: pointer;
+      }
+      .grid-item img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+      }
+      /* Estilos para os novos botões */
+      .action-buttons {
+         display: flex;
+         gap: 10px;
+         margin-top: 20px;
+         justify-content: center;
+      }
+      .action-buttons button {
+         padding: 12px 20px;
+         border: none;
+         border-radius: 4px;
+         font-size: 16px;
+         cursor: pointer;
+         color: #121212;
+         font-weight: bold;
+         transition: background-color 0.3s ease;
+      }
+      .action-buttons #export-button {
+         background-color: #d4a761;
+         color: #121212;
+      }
+      .action-buttons #export-button:hover {
+         background-color: #b88d55;
+      }
+      .action-buttons #import-button {
+         background-color: #333;
+         color: #ffffff;
+      }
+      .action-buttons #import-button:hover {
+         background-color: #444;
+      }
+      .action-buttons #clear-button {
+            background-color: #121212;
+            color: #ffffff;
+      }
+      .action-buttons #clear-button:hover {
+            background-color: #222;
+      }
+      #import-file-input {
+         display: none;
+      }
+       
+      /* Estilos para os menus collapsible */
+      .collapsible {
+         background-color: #333;
+         color: white;
+         cursor: pointer;
+         padding: 18px;
+         width: 100%;
+         border: none;
+         text-align: left;
+         outline: none;
+         font-size: 18px;
+         margin-bottom: 5px;
+         border-radius: 5px;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+      }
+       
+      .collapsible:after {
+         content: '\002B';
+         font-weight: bold;
+         float: right;
+         margin-left: 5px;
+      }
+       
+      .active:after {
+         content: "\2212";
+      }
+       
+      .content {
+         padding: 0 18px;
+         max-height: 0;
+         overflow: hidden;
+         transition: max-height 0.2s ease-out;
+         background-color: #1e1e1e;
+         border-radius: 0 0 5px 5px;
+         width: 100%;
+         box-sizing: border-box;
+      }
+       
+      .menu-container {
+         width: 100%;
+         max-width: 800px;
+         margin: 0 auto;
+      }
+       
+      .menu-section {
+         margin-bottom: 20px;
+      }
+       
+      /* Estilo para o backup manager */
+      .backup-buttons {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 10px;
+         padding: 10px 0;
+      }
+       
+      .backup-buttons button {
+         padding: 10px 15px;
+         background-color: #6200ee;
+         color: white;
+         border: none;
+         border-radius: 5px;
+         cursor: pointer;
+      }
+       
+      .backup-buttons button:hover {
+         background-color: #7b29ff;
+      }
+   </style>
 </head>
 <body>
 
 <header class="header">
-  <div class="rectangle">Bau reserva</div>
+   <div class="rectangle">Bau reserva</div>
 </header>
 
 <main class="container">
-  <div class="menu-container">
-    <div class="menu-section">
-      <button type="button" class="collapsible">Bau Reserva</button>
-      <div class="content">
-        <div class="column">
-          <h2>Clique para editar no botão amarelo</h2>
-          <div class="grid-container" id="grid-container"></div>
-        </div>
+   <div class="menu-container">
+      <div class="menu-section">
+         <button type="button" class="collapsible">Bau Reserva</button>
+         <div class="content">
+            <div class="column">
+               <h2>Clique para editar no botão amarelo</h2>
+               <div class="grid-container" id="grid-container"></div>
+            </div>
+         </div>
       </div>
-    </div>
-    
-    <div class="menu-section">
-      <button type="button" class="collapsible">Photos</button>
-      <div class="content">
-        <div class="photos-grid" id="photos-grid">
-          </div>
+       
+      <div class="menu-section">
+         <button type="button" class="collapsible">Gerenciar Backup</button>
+         <div class="content">
+            <div class="backup-buttons">
+               <button id="export-button">Exportar Backup 💾</button>
+               <button id="import-button">Importar Backup 📂</button>
+               <button id="clear-button">Limpar Dados 🗑️</button>
+               <input type="file" id="import-file-input" accept=".json">
+            </div>
+         </div>
       </div>
-    </div>
-    
-    <div class="menu-section">
-      <button type="button" class="collapsible">Gerenciar Backup</button>
-      <div class="content">
-        <div class="backup-buttons">
-          <button id="export-button">Exportar Backup 💾</button>
-          <button id="import-button">Importar Backup 📂</button>
-          <button id="clear-button">Limpar Dados 🗑️</button>
-          <input type="file" id="import-file-input" accept=".json">
-        </div>
-      </div>
-    </div>
-  </div>
+   </div>
 </main>
 
 <footer class="footer">
-  </footer>
+   </footer>
 
 <div id="crud-modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>Editar Box of Exile</h2>
-      <span class="close-button">&times;</span>
-    </div>
-    <div class="modal-body">
-      <form id="crud-form">
-        <h3>Imagens do Grid</h3>
-        <div id="grid-upload-inputs"></div>
-        <button type="submit">Salvar Alterações</button>
-      </form>
-    </div>
-  </div>
+   <div class="modal-content">
+      <div class="modal-header">
+         <h2>Editar Box of Exile</h2>
+         <span class="close-button">&times;</span>
+         </div>
+      <div class="modal-body">
+         <form id="crud-form">
+            <h3>Imagens do Grid</h3>
+            <div id="grid-upload-inputs"></div>
+            <button type="submit">Salvar Alterações</button>
+         </form>
+      </div>
+   </div>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const crudModal = document.getElementById('crud-modal');
-    const crudForm = document.getElementById('crud-form');
-    const closeButton = document.querySelector('.close-button');
-    const gridContainer = document.getElementById('grid-container');
-    const gridUploadInputs = document.getElementById('grid-upload-inputs');
-    const photosGrid = document.getElementById('photos-grid');
-    
-    const exportButton = document.getElementById('export-button');
-    const importButton = document.getElementById('import-button');
-    const clearButton = document.getElementById('clear-button');
-    const importFileInput = document.getElementById('import-file-input');
+   document.addEventListener('DOMContentLoaded', () => {
+      const crudModal = document.getElementById('crud-modal');
+      const crudForm = document.getElementById('crud-form');
+      const closeButton = document.querySelector('.close-button');
+      const gridContainer = document.getElementById('grid-container');
+      const gridUploadInputs = document.getElementById('grid-upload-inputs');
+       
+      const exportButton = document.getElementById('export-button');
+      const importButton = document.getElementById('import-button');
+      const clearButton = document.getElementById('clear-button');
+      const importFileInput = document.getElementById('import-file-input');
 
-    // Collapsible menus functionality
-    const coll = document.getElementsByClassName("collapsible");
-    for (let i = 0; i < coll.length; i++) {
-      coll[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        const content = this.nextElementSibling;
-        if (content.style.maxHeight) {
-          content.style.maxHeight = null;
-        } else {
-          content.style.maxHeight = content.scrollHeight + "px";
-        }
-      });
-    }
-
-    // Abrir o primeiro menu por padrão
-    if (coll.length > 0) {
-      coll[0].click();
-    }
-
-    let savedState = JSON.parse(localStorage.getItem('playerProfile')) || {
-      photos: []
-    };
-
-    const createGrid = () => {
-      gridContainer.innerHTML = '';
-      for (let i = 0; i < 25; i++) {
-        const gridItem = document.createElement('div');
-        gridItem.className = 'grid-item';
-        gridItem.dataset.gridId = i;
-        const img = document.createElement('img');
-        img.id = `grid-img-${i}`;
-        img.src = savedState[`gridImg${i}`] || 'https://via.placeholder.com/100/333333/ffffff?text=Item';
-        gridItem.appendChild(img);
-        gridContainer.appendChild(gridItem);
+      // Collapsible menus functionality
+      const coll = document.getElementsByClassName("collapsible");
+      for (let i = 0; i < coll.length; i++) {
+         coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            const content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+               content.style.maxHeight = null;
+            } else {
+               content.style.maxHeight = content.scrollHeight + "px";
+            }
+         });
       }
-    };
 
-    const createPhotosGrid = () => {
-      photosGrid.innerHTML = '';
-      if (savedState.photos && savedState.photos.length > 0) {
-        savedState.photos.forEach((photo, index) => {
-          const img = document.createElement('img');
-          img.src = photo;
-          img.className = 'photo-item';
-          img.alt = `Photo ${index + 1}`;
-          photosGrid.appendChild(img);
-        });
-      } else {
-        // Adiciona alguns placeholders se não houver fotos
-        for (let i = 0; i < 6; i++) {
-          const img = document.createElement('img');
-          img.src = 'https://via.placeholder.com/100/333333/ffffff?text=Photo';
-          img.className = 'photo-item';
-          img.alt = `Photo ${i + 1}`;
-          photosGrid.appendChild(img);
-        }
+      // Abrir o primeiro menu por padrão
+      if (coll.length > 0) {
+         coll[0].click();
       }
-    };
 
-    const createGridInputs = () => {
-      gridUploadInputs.innerHTML = '';
-      for (let i = 0; i < 25; i++) {
-        const label = document.createElement('label');
-        label.textContent = `Mudar Item ${i + 1}:`;
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.id = `grid-upload-${i}`;
-        input.accept = 'image/*';
-        gridUploadInputs.appendChild(label);
-        gridUploadInputs.appendChild(input);
-      }
-    };
+      let savedState = JSON.parse(localStorage.getItem('playerProfile')) || {};
 
-    const loadData = (data = savedState) => {
-      if (data) {
-        for (let i = 0; i < 25; i++) {
-          const gridImg = document.getElementById(`grid-img-${i}`);
-          if (gridImg) {
-            gridImg.src = data[`gridImg${i}`] || 'https://via.placeholder.com/100/333333/ffffff?text=Item';
-          }
-        }
-        
-        if (data.photos) {
-          savedState.photos = data.photos;
-          createPhotosGrid();
-        }
-      }
-    };
+      const createGrid = () => {
+         gridContainer.innerHTML = '';
+         for (let i = 0; i < 25; i++) {
+            const gridItem = document.createElement('div');
+            gridItem.className = 'grid-item';
+            gridItem.dataset.gridId = i;
+            const img = document.createElement('img');
+            img.id = `grid-img-${i}`;
+            img.src = savedState[`gridImg${i}`] || 'https://via.placeholder.com/100/333333/ffffff?text=Item';
+            gridItem.appendChild(img);
+            gridContainer.appendChild(gridItem);
+         }
+      };
 
-    const saveData = (data) => {
-      // Preserva as fotos existentes se não estiverem sendo atualizadas
-      if (!data.photos && savedState.photos) {
-        data.photos = savedState.photos;
-      }
-      localStorage.setItem('playerProfile', JSON.stringify(data));
-      savedState = data;
-    };
+      const createGridInputs = () => {
+         gridUploadInputs.innerHTML = '';
+         for (let i = 0; i < 25; i++) {
+            const label = document.createElement('label');
+            label.textContent = `Mudar Item ${i + 1}:`;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.id = `grid-upload-${i}`;
+            input.accept = 'image/*';
+            gridUploadInputs.appendChild(label);
+            gridUploadInputs.appendChild(input);
+         }
+      };
 
-    const updateImage = (file, imgEl, key, data) => {
-      return new Promise(resolve => {
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = e => {
-            imgEl.src = e.target.result;
-            data[key] = e.target.result;
-            resolve();
-          };
-          reader.readAsDataURL(file);
-        } else {
-          const existingData = JSON.parse(localStorage.getItem('playerProfile')) || {};
-          data[key] = existingData[key] || 'https://via.placeholder.com/100/333333/ffffff?text=Item';
-          resolve();
-        }
-      });
-    };
+      const loadData = (data = savedState) => {
+         if (data) {
+            for (let i = 0; i < 25; i++) {
+               const gridImg = document.getElementById(`grid-img-${i}`);
+               if (gridImg) {
+                  gridImg.src = data[`gridImg${i}`] || 'https://via.placeholder.com/100/333333/ffffff?text=Item';
+               }
+            }
+         }
+      };
 
-    const exportData = () => {
-      const dataStr = JSON.stringify(savedState, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'playerProfile_backup.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    };
+      const saveData = (data) => {
+         localStorage.setItem('playerProfile', JSON.stringify(data));
+         savedState = data;
+      };
 
-    const importData = (event) => {
-      const file = event.target.files[0];
-      if (!file) {
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const importedData = JSON.parse(e.target.result);
-          if (confirm('Tem certeza que deseja importar o backup? Isso substituirá todos os dados atuais.')) {
-            saveData(importedData);
-            loadData(importedData);
+      const updateImage = (file, imgEl, key, data) => {
+         return new Promise(resolve => {
+            if (file) {
+               const reader = new FileReader();
+               reader.onload = e => {
+                  imgEl.src = e.target.result;
+                  data[key] = e.target.result;
+                  resolve();
+               };
+               reader.readAsDataURL(file);
+            } else {
+               const existingData = JSON.parse(localStorage.getItem('playerProfile')) || {};
+               data[key] = existingData[key] || 'https://via.placeholder.com/100/333333/ffffff?text=Item';
+               resolve();
+            }
+         });
+      };
+
+      const exportData = () => {
+         const dataStr = JSON.stringify(savedState, null, 2);
+         const blob = new Blob([dataStr], { type: 'application/json' });
+         const url = URL.createObjectURL(blob);
+         const a = document.createElement('a');
+         a.href = url;
+         a.download = 'playerProfile_backup.json';
+         document.body.appendChild(a);
+         a.click();
+         document.body.removeChild(a);
+         URL.revokeObjectURL(url);
+      };
+
+      const importData = (event) => {
+         const file = event.target.files[0];
+         if (!file) {
+            return;
+         }
+         const reader = new FileReader();
+         reader.onload = (e) => {
+            try {
+               const importedData = JSON.parse(e.target.result);
+               if (confirm('Tem certeza que deseja importar o backup? Isso substituirá todos os dados atuais.')) {
+                  saveData(importedData);
+                  loadData(importedData);
+                  createGrid();
+                  alert('Backup importado com sucesso!');
+               }
+            } catch (error) {
+               alert('Erro ao importar o arquivo. Verifique se o arquivo JSON é válido.');
+               console.error(error);
+            }
+         };
+         reader.readAsText(file);
+      };
+       
+      const clearData = () => {
+         if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação é irreversível.')) {
+            localStorage.removeItem('playerProfile');
+            savedState = {};
+            loadData(savedState);
             createGrid();
-            createPhotosGrid();
-            alert('Backup importado com sucesso!');
-          }
-        } catch (error) {
-          alert('Erro ao importar o arquivo. Verifique se o arquivo JSON é válido.');
-          console.error(error);
-        }
-      };
-      reader.readAsText(file);
-    };
-    
-    const clearData = () => {
-      if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação é irreversível.')) {
-        localStorage.removeItem('playerProfile');
-        savedState = {
-          photos: []
-        };
-        loadData(savedState);
-        createGrid();
-        createPhotosGrid();
-        alert('Todos os dados foram limpos com sucesso!');
-      }
-    };
-
-    // Inicialização
-    createGrid();
-    createPhotosGrid();
-    loadData();
-
-    // Evento para abrir o modal
-    gridContainer.addEventListener('click', () => {
-      createGridInputs();
-      crudModal.style.display = 'flex';
-    });
-    
-    closeButton.addEventListener('click', () => crudModal.style.display = 'none');
-    window.addEventListener('click', e => {
-      if (e.target === crudModal) crudModal.style.display = 'none';
-    });
-
-    crudForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      
-      let data = {
-        photos: savedState.photos || []
+            alert('Todos os dados foram limpos com sucesso!');
+         }
       };
 
-      const imageUpdates = [];
+      // Inicialização
+      createGrid();
+      loadData();
 
-      for (let i = 0; i < 25; i++) {
-        const file = document.getElementById(`grid-upload-${i}`).files[0];
-        const imgElement = document.getElementById(`grid-img-${i}`);
-        imageUpdates.push(updateImage(file, imgElement, `gridImg${i}`, data));
-      }
+      // Evento para abrir o modal
+      gridContainer.addEventListener('click', () => {
+         createGridInputs();
+         crudModal.style.display = 'flex';
+      });
+       
+      closeButton.addEventListener('click', () => crudModal.style.display = 'none');
+      window.addEventListener('click', e => {
+         if (e.target === crudModal) crudModal.style.display = 'none';
+      });
 
-      await Promise.all(imageUpdates);
+      crudForm.addEventListener('submit', async e => {
+         e.preventDefault();
+          
+         let data = {};
 
-      saveData(data);
-      crudModal.style.display = 'none';
-      alert('Alterações salvas com sucesso!');
-    });
+         const imageUpdates = [];
 
-    exportButton.addEventListener('click', exportData);
-    importButton.addEventListener('click', () => importFileInput.click());
-    importFileInput.addEventListener('change', importData);
-    clearButton.addEventListener('click', clearData);
-  });
+         for (let i = 0; i < 25; i++) {
+            const file = document.getElementById(`grid-upload-${i}`).files[0];
+            const imgElement = document.getElementById(`grid-img-${i}`);
+            imageUpdates.push(updateImage(file, imgElement, `gridImg${i}`, data));
+         }
+
+         await Promise.all(imageUpdates);
+
+         saveData(data);
+         crudModal.style.display = 'none';
+         alert('Alterações salvas com sucesso!');
+      });
+
+      exportButton.addEventListener('click', exportData);
+      importButton.addEventListener('click', () => importFileInput.click());
+      importFileInput.addEventListener('change', importData);
+      clearButton.addEventListener('click', clearData);
+   });
 </script>
 
 </body>

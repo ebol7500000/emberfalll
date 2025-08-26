@@ -255,7 +255,6 @@
 <body>
 
     <div class="main-container">
-        <!-- Accordion para adicionar nova checklist -->
         <div class="accordion">
             <div class="accordion-header">Adicionar Nova Checklist</div>
             <div class="accordion-content">
@@ -271,7 +270,6 @@
             </div>
         </div>
         
-        <!-- Accordion para gerenciamento JSON -->
         <div class="accordion">
             <div class="accordion-header">Gerenciamento de Dados (JSON)</div>
             <div class="accordion-content">
@@ -286,8 +284,7 @@
         </div>
 
         <div class="checklists-container" id="checklists-container">
-            <!-- As checklists serão renderizadas aqui -->
-        </div>
+            </div>
     </div>
 
     <script>
@@ -299,11 +296,11 @@
             const importFile = document.getElementById('import-file');
 
             // --- Accordion Functionality ---
+            
             const accordionHeaders = document.querySelectorAll('.accordion-header');
             
             accordionHeaders.forEach(header => {
                 header.addEventListener('click', () => {
-                    const accordion = header.parentElement;
                     const content = header.nextElementSibling;
                     
                     header.classList.toggle('active');
@@ -329,10 +326,7 @@
                         return [];
                     }
                 }
-                return [
-                    { id: 'fce', title: 'Livro F.C.E', items: generateItems(0, 894, 4) },
-                    { id: 'ice', title: 'Livro I.C.E', items: generateItems(0, 817, 1) }
-                ];
+                return []; // Inicia com uma lista vazia, removendo as checklists pré-definidas.
             }
 
             function saveChecklists(checklists) {
@@ -414,7 +408,7 @@
                         }
                     });
                     
-                    // Abre o primeiro accordion por padrão
+                    // Abre o primeiro accordion por padrão, se existir
                     if (checklists.indexOf(checklist) === 0) {
                         accordionHeader.classList.add('active');
                         accordionContent.style.maxHeight = accordionContent.scrollHeight + 'px';

@@ -15,7 +15,7 @@
             align-items: center;
             flex-direction: column;
             margin: 0;
-            padding: 20px; /* Adicionado para dar espaço */
+            padding: 20px;
         }
 
         .window {
@@ -247,8 +247,7 @@
 <body>
     <div class="window">
         <div id="books-container">
-            <!-- Card 1 -->
-            <div class="card">
+                        <div class="card">
                 <div class="card-header" onclick="toggleCollapse(this)">
                     Livro F.C.E
                 </div>
@@ -278,8 +277,7 @@
                 </div>
             </div>
 
-            <!-- Card 2 -->
-            <div class="card">
+                        <div class="card">
                 <div class="card-header" onclick="toggleCollapse(this)">
                     Livro I.C.E
                 </div>
@@ -309,8 +307,7 @@
                 </div>
             </div>
             
-            <!-- Card 3 (adicionei um terceiro card como exemplo) -->
-            <div class="card">
+                        <div class="card">
                 <div class="card-header" onclick="toggleCollapse(this)">
                     Novo Livro *
                 </div>
@@ -325,12 +322,11 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="backup-controls">
-        <button id="export-btn">Exportar Backup 📤</button>
-        <label for="import-file" class="import-label">Importar Backup 📥</label>
-        <input type="file" id="import-file" accept=".json">
+        <div class="backup-controls">
+            <button id="export-btn">Exportar Backup 📤</button>
+            <label for="import-file" class="import-label">Importar Backup 📥</label>
+            <input type="file" id="import-file" accept=".json">
+        </div>
     </div>
 
     <script>
@@ -369,7 +365,7 @@
         function deleteBook(bookId) {
             const bookElement = document.getElementById(`book-${bookId}`);
             if (bookElement) {
-                bookElement.remove();
+                bookElement.closest('.card').remove(); // Use .closest() para remover o card inteiro
                 localStorage.removeItem(`book-${bookId}`);
             }
         }
@@ -410,7 +406,8 @@
             const booksContainer = document.getElementById('books-container');
             const children = Array.from(booksContainer.children);
             children.forEach(child => {
-                if (child.id !== 'book-1' && child.id !== 'book-2') {
+                // Mantém apenas os cards que contêm os livros padrão
+                if (child.querySelector('#book-1') === null && child.querySelector('#book-2') === null && child.querySelector('#add-book-form') === null) {
                     booksContainer.removeChild(child);
                 }
             });
