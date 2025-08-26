@@ -22,7 +22,7 @@ Em um reino moldado pela chama da eficiência, Emberfall convoca heróis (como v
 
 2. Lance seu app no navegador:
 
-   * Dê um duplo clique no arquivo `index.html`, ou
+   * Dê um duplo clique no arquivo `splash.html`, ou
    * Use um servidor local para testes (como `live-server` ou `http-server`).
 
 3. Aventure-se! Crie, complete tarefas, deslize com eficiência.
