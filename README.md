@@ -1,6 +1,3 @@
-Tools; ![ChatGPT](https://img.shields.io/badge/chatGPT-74aa9c?style=for-the-badge&logo=openai&logoColor=white) ; ![Google Gemini](https://img.shields.io/badge/google%20gemini-8E75B2?style=for-the-badge&logo=google%20gemini&logoColor=white)
-
-
 # Emberfalll: O App de Produtividade Forjado no Fogo da Rotina
 
 Bem-vindo, aventureiro — você acaba de entrar em Emberfall, uma terra onde afazeres se tornam quests e tarefas do dia a dia viram conquistas lendárias!
@@ -48,6 +45,13 @@ Este projeto segue a **MIT License** — liberdade para explorar, copiar, adapta
 
 ---
 
+##  Tecnologias
+- **HTML**, **CSS** e **JavaScript** (vanilla)
+- Integrações com:
+  - **Gemini** — expansão da inteligência do app (descreva como usa: API? Prompt?)
+  - **ChatGPT** — geração de sugestões, respostas ou comandos (explique a interação)
+
+    
 ### Missões de Contribuição
 
 Se quiser contribuir, basta:
